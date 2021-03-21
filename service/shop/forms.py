@@ -1,12 +1,12 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.db import transaction
-from phonenumber_field.form_fields import PhoneNumberField
+from django import forms
 
 from shop.models import EndUser, User
 
 class EndUserSignUpForm(UserCreationForm):
-    phone = PhoneNumberField()
+    phone = forms.CharField(max_length=17, empty_value=False)
 
     class Meta(UserCreationForm.Meta):
         model = User
@@ -18,6 +18,8 @@ class EndUserSignUpForm(UserCreationForm):
         user.save()
 
         enduser = EndUser.objects.create(user=user)
-        enduser.phone.add(*self.cleaned_data.get('phone'))
+        phone = self.cleaned_data.get('phone')
+        enduser.phone = phone
+        enduser.save()
 
         return user
