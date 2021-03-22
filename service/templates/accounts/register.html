@@ -1,24 +1,43 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="text-center">
-<h1 alignment="center"> Login </h1>
-<form class="form_class" method="post">
-  <div class="form-group row">
-    <label for="staticEmail" class="col-sm-2 col-form-label">Email</label>
-    <div class="col-sm-10">
-      <input type="text" class="form-control-plaintext" id="staticEmail" value="email@example.com">
+
+
+<div class="container mt-5 pt-4">
+    
+    <div class="col-6 mx-auto">
+        <h3 class="text-center">Register</h3>
+        <form method="post">
+            {% csrf_token %}
+
+            {% if message %}
+            <div class="alert alert-{{class}}">
+                {{message}}
+            </div>
+            {% endif %}
+
+            <div class="row">
+                <div class="form-group col-12">
+                    <input type="text" placeholder="Email" class="form-control" name="email" id="">
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-12">
+                    <input type="text" placeholder="Name" class="form-control" name="name" id="">
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-12">
+                    <input type="text" placeholder="Phone Number" class="form-control" name="phone" id="">
+                </div>
+            </div>
+
+            <p>Already have account <a href="{% url 'login' %}">Login</a></p>
+            <button class="btn btn-primary">Submit</button>
+        </form>
     </div>
-  </div>
-  <div class="form-group row">
-    <label for="inputPassword" class="col-sm-2 col-form-label">Password</label>
-    <div class="col-sm-10">
-      <input type="password" class="form-control" id="inputPassword" placeholder="Password">
-    </div>
-  </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
-    <p>Don't have an account? <a href="#">Sign up now</a>.</p>
+
 </div>
 
-</form>
+
 {% endblock %}

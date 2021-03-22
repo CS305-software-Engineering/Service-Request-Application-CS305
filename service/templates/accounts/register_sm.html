@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+
+<div class="container mt-5 pt-4">
+    
+    <div class="col-6 mx-auto">
+        <h3 class="text-center">Register</h3>
+        <form method="post">
+            {% csrf_token %}
+
+            {% if message %}
+            <div class="alert alert-{{class}}">
+                {{message}}
+            </div>
+            {% endif %}
+
+            <div class="row">
+                <div class="form-group col-12">
+                    <input type="text" placeholder="Email" class="form-control" name="email" id="">
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-12">
+                    <input type="text" placeholder="Phone Number" class="form-control" name="phone" id="">
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-12">
+                    <input type="text" placeholder="Company Name" class="form-control" name="company_name" id="">
+                </div>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="" name="is_plumber">
+                <label class="form-check-label" for="inlineCheckbox1">Plumber</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="" name="is_mechanic">
+                <label class="form-check-label" for="inlineCheckbox2">Mechanic</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="" name="is_electrician">
+                <label class="form-check-label" for="inlineCheckbox3">Electrician</label>
+            </div>
+            <div class="row">
+                <div class="form-group col-12">
+                    <input type="text" placeholder="Other Services(if any)" class="form-control" name="other_services" id="">
+                </div>
+            </div>
+            <p>Already have account <a href="{% url 'login' %}">Login</a></p>
+            <button class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+
+</div>
+
+
+{% endblock %}

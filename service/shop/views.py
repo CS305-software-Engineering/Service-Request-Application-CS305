@@ -3,7 +3,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 
-from shop.models import EndUser
+from shop.models import EndUser,serviceman
 
 import random
 import http.client
@@ -33,7 +33,7 @@ def login_attempt(request):
         user = EndUser.objects.filter(phone=phone).first()
         if user is None:
             context = {'message': 'User not found', 'class': 'danger'}
-            return render(request, 'shop/login.html', context)
+            return render(request, 'accounts/login.html', context)
 
         otp = str(random.randint(1000, 9999))
         user.otp = otp
@@ -43,7 +43,7 @@ def login_attempt(request):
         request.session['phone'] = phone
         return redirect('login_otp')
 
-    return render(request, 'shop/login.html')
+    return render(request, 'accounts/login.html')
 
 def login_otp(request):
     phone = request.session['phone']
@@ -56,13 +56,13 @@ def login_otp(request):
         if otp == user.otp:
             user = User.objects.get(id = user.user.id)
             login(request, user)
-            return redirect('https://www.google.com')
+            return redirect('home')
 
         else:
             context = {'message': 'Wrong OTP', 'class': 'danger', 'phone': phone}
-            return render(request, 'shop/login_otp.html', context)
+            return render(request, 'accounts/login_otp.html', context)
 
-    return render(request, 'shop/login_otp.html', context)
+    return render(request, 'accounts/login_otp.html', context)
 
 def register(request):
     if request.method == "POST":
@@ -75,7 +75,7 @@ def register(request):
 
         if check_user or check_enduser:
             context = {'message': 'User already exists', 'class': 'danger'}
-            return render(request, 'shop/register.html', context)
+            return render(request, 'accounts/register.html', context)
 
         user = User(username = phone, email = email, first_name = name)
         user.save()
@@ -86,22 +86,67 @@ def register(request):
 
         send_otp(phone, otp)
         request.session['phone'] = phone
+        request.session['type'] = 1
         return redirect('otp')
 
-    return render(request, 'shop/register.html')
+    return render(request, 'accounts/register.html')
 
 def otp(request):
     phone = request.session["phone"]
-    context = {'phone' : phone}
+    type_ = request.session['type']
+    context = {'phone' : phone,'type':type_}
 
     if request.method == "POST":
         otp = request.POST.get('otp')
-        enduser = EndUser.objects.filter(phone = phone).first()
+        if type_== 1:
+            enduser = EndUser.objects.filter(phone = phone).first()
 
-        if otp == enduser.otp:
-            return redirect("https://www.google.com")
+            if otp == enduser.otp:
+                return redirect("https://www.google.com")
+            else:
+                context = {"message": "Wrong OTP", "class": "danger", "phone": phone,"type":type_}
+                return render(request, "accounts/otp.html", context)
         else:
-            context = {"message": "Wrong OTP", "class": "danger", "phone": phone}
-            return render(request, "shop/otp.html", context)
+            service_man = serviceman.objects.filter(phone = phone).first()
 
-    return render(request, "shop/otp.html", context) 
+            if otp == service_man.otp:
+                return redirect('home')
+            else:
+                context = {"message": "Wrong OTP", "class": "danger", "phone": phone,"type":type_}
+                return render(request, "accounts/otp.html", context)
+
+    return render(request, "accounts/otp.html", context) 
+
+def register_sevice(request):
+    if request.method == "POST":
+        email = request.POST.get('email')
+        company_name = request.POST.get('company_name')
+        phone = request.POST.get('phone')
+        is_plumber=request.POST.get('is_plumber')=="on"
+        is_electrician=request.POST.get('is_electrician')=="on"
+        is_mechanic=request.POST.get('is_mechanic')=="on"
+        other_services=request.POST.get('other_services')
+        #print(is_plumber)
+        check_user = User.objects.filter(email = email).first()
+        check_serviceman = serviceman.objects.filter(phone = phone).first()
+
+        if check_user or check_serviceman:
+            context = {'message': 'User already exists', 'class': 'danger'}
+            return render(request, 'accounts/register_sm.html', context)
+
+        user = User(username = phone, email = email, first_name = company_name)
+        user.save()
+
+        otp = str(random.randint(1000, 9999))
+        service_man = serviceman(user = user, phone = phone, otp = otp,is_plumber=is_plumber,is_electrician=is_electrician,is_mechanic=is_mechanic,other_services=other_services,company_name=company_name)
+        service_man.save()
+
+        send_otp(phone, otp)
+        request.session['phone'] = phone
+        request.session['type'] = 2
+        return redirect('otp')
+
+    return render(request, 'accounts/register_sm.html')
+
+def home(request):
+    return render(request, 'shop/home.html')

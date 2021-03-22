@@ -18,3 +18,4 @@ class serviceman(models.Model):
     is_electrician = models.BooleanField(default=False)
     is_mechanic = models.BooleanField(default=False)
     other_services = models.CharField(max_length=100,default="None")
+    otp = models.CharField(max_length=6,default="1111")

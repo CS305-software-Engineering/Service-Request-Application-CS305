@@ -1,5 +1,6 @@
 from django.contrib import admin
-from shop.models import EndUser
+from .models import EndUser,serviceman
 
 # Register your models here.
 admin.site.register(EndUser)
+admin.site.register(serviceman)
