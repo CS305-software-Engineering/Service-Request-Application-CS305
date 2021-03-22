@@ -16,10 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-from shop.views import EndUserSignUpView
-
 urlpatterns = [
-    path('accounts/', include('django.contrib.auth.urls')),
-    path('accounts/signup/endusers', EndUserSignUpView.as_view(), name="enduser_signup"),
+    path('', include('shop.urls')),
     path('admin/', admin.site.urls),
 ]
