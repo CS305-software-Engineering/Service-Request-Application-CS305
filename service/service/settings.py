@@ -123,3 +123,5 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 AUTH_KEY = ""
+
+LOGOUT_REDIRECT_URL = '/'

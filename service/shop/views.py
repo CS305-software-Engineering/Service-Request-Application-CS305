@@ -31,36 +31,69 @@ def login_attempt(request):
         phone = request.POST.get('phone')
 
         user = EndUser.objects.filter(phone=phone).first()
-        if user is None:
+        print(user)
+        service_man = serviceman.objects.filter(phone = phone).first()
+        print(service_man)
+        if user is None and service_man is not None:
+            otp = str(random.randint(1000, 9999))
+            service_man.otp = otp
+            service_man.save()
+            send_otp(phone, otp)
+            request.session['phone'] = phone
+            request.session['type'] = 2
+            return redirect('login_otp')
+
+        elif user is not None and service_man is None:
+            otp = str(random.randint(1000, 9999))
+            user.otp = otp
+            user.save()
+            send_otp(phone, otp)
+            request.session['phone'] = phone
+            request.session['type'] = 1
+            return redirect('login_otp')
+        else:
             context = {'message': 'User not found', 'class': 'danger'}
             return render(request, 'accounts/login.html', context)
 
-        otp = str(random.randint(1000, 9999))
-        user.otp = otp
-        user.save()
-        send_otp(phone, otp)
+        # otp = str(random.randint(1000, 9999))
+        # user.otp = otp
+        # user.save()
+        # send_otp(phone, otp)
 
-        request.session['phone'] = phone
-        return redirect('login_otp')
+        # request.session['phone'] = phone
+        # return redirect('login_otp')
 
     return render(request, 'accounts/login.html')
 
 def login_otp(request):
     phone = request.session['phone']
+    type_ = request.session['type']
     context = {'phone': phone}
 
     if request.method == "POST":
         otp = request.POST.get('otp')
-        user = EndUser.objects.filter(phone=phone).first()
+        if type_==1:
+            user = EndUser.objects.filter(phone=phone).first()
 
-        if otp == user.otp:
-            user = User.objects.get(id = user.user.id)
-            login(request, user)
-            return redirect('home')
+            if otp == user.otp:
+                user = User.objects.get(id = user.user.id)
+                login(request, user)
+                return redirect('home')
+            else:
+                context = {'message': 'Wrong OTP', 'class': 'danger', 'phone': phone}
+                return render(request, 'accounts/login_otp.html', context)
 
         else:
-            context = {'message': 'Wrong OTP', 'class': 'danger', 'phone': phone}
-            return render(request, 'accounts/login_otp.html', context)
+            service_man = serviceman.objects.filter(phone=phone).first()
+
+            if otp == service_man.otp:
+                user = User.objects.get(id = service_man.user.id)
+                login(request, user)
+                return redirect('home')
+            else:
+                context = {'message': 'Wrong OTP', 'class': 'danger', 'phone': phone}
+                return render(request, 'accounts/login_otp.html', context)
+
 
     return render(request, 'accounts/login_otp.html', context)
 
@@ -102,7 +135,9 @@ def otp(request):
             enduser = EndUser.objects.filter(phone = phone).first()
 
             if otp == enduser.otp:
-                return redirect("https://www.google.com")
+                user = User.objects.get(id = enduser.user.id)
+                login(request, user)
+                return redirect('home')
             else:
                 context = {"message": "Wrong OTP", "class": "danger", "phone": phone,"type":type_}
                 return render(request, "accounts/otp.html", context)
@@ -110,6 +145,8 @@ def otp(request):
             service_man = serviceman.objects.filter(phone = phone).first()
 
             if otp == service_man.otp:
+                user = User.objects.get(id = service_man.user.id)
+                login(request, user)
                 return redirect('home')
             else:
                 context = {"message": "Wrong OTP", "class": "danger", "phone": phone,"type":type_}
