@@ -3,7 +3,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 
-from shop.models import EndUser,serviceman
+from shop.models import EndUser,serviceman,Request
 
 import random
 import http.client

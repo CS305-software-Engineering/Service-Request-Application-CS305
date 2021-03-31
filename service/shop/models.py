@@ -20,3 +20,15 @@ class serviceman(models.Model):
     is_mechanic = models.BooleanField(default=False)
     other_services = models.CharField(max_length=100,default="None")
     otp = models.CharField(max_length=6,default="1111")
+
+class Request(models.Model):
+    requestid = models.AutoField(primary_key=True)
+    customer_id = models.CharField(default="_",max_length=200)
+    serviceman_id = models.CharField(default="_",max_length=200)
+    cost = models.FloatField(default=0.0,editable=True)
+    ispaid = models.BooleanField(default=False,editable=True)
+    department = models.CharField(default='_',max_length=200)
+    completed = models.BooleanField(default=False,editable=True)
+    rating = models.FloatField(default=-1)
+    feedback = models.CharField(default='_',max_length=500)
+
