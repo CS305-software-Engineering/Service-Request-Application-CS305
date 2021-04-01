@@ -187,3 +187,13 @@ def register_sevice(request):
 
 def home(request):
     return render(request, 'shop/home.html')
+
+
+def staff_request(request):
+    return render(request, 'shop/staff_page.html')
+
+def user_request(request):
+    return render(request, 'shop/user_page.html')
+
+def add_request(request):
+    return render(request, 'shop/new_request.html')
