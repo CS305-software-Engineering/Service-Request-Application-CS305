@@ -193,7 +193,23 @@ def staff_request(request):
     return render(request, 'shop/staff_page.html')
 
 def user_request(request):
-    return render(request, 'shop/user_page.html')
+    current_user = request.user
+    service_requests = Request.objects.filter(customer_id = current_user.id)
+    context = {
+        'requests' : service_requests
+    }
+
+    return render(request, 'shop/user_page.html', context)
+
+def request_page(request):
+    if request.method == 'POST':
+        request_id = request.POST['request']
+        service_request = Request.objects.filter(requestid = request_id).first()
+        context = {
+            'service_request' : service_request
+        }
+
+        return render(request, 'shop/request_page.html', context)
 
 def add_request(request):
     return render(request, 'shop/new_request.html')
