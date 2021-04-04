@@ -3,6 +3,9 @@ from django.db import models
 from django.core.validators import RegexValidator
 
 
+#   python -m venv djangoenv
+#   source djangoenv/bin/activate
+
 # Model for End User
 class EndUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
@@ -23,6 +26,7 @@ class serviceman(models.Model):
 
 class Request(models.Model):
     requestid = models.AutoField(primary_key=True)
+    accepted = models.IntegerField(default=-1)
     customer_id = models.CharField(default="_",max_length=200)
     serviceman_id = models.CharField(default="_",max_length=200)
     cost = models.FloatField(default=0.0,editable=True)

@@ -7,6 +7,7 @@ from shop.models import EndUser,serviceman,Request
 
 import random
 import http.client
+from django.http import HttpResponse
 
 # Create your views here.
 def send_otp(mobile, otp):
@@ -189,9 +190,6 @@ def home(request):
     return render(request, 'shop/home.html')
 
 
-def staff_request(request):
-    return render(request, 'shop/staff_page.html')
-
 def user_request(request):
     current_user = request.user
     service_requests = Request.objects.filter(customer_id = current_user.id)
@@ -212,4 +210,68 @@ def request_page(request):
         return render(request, 'shop/request_page.html', context)
 
 def add_request(request):
-    return render(request, 'shop/new_request.html')
+    def classicication(image):
+        ## Code for image classification
+        image_type = "The output" ## Output
+        return image_type
+
+
+    if request.method == 'POST':
+        requestid = request.POST.get('requestid')
+        accepted = request.POST.get('accepted')
+        customer_id = request.POST.get('customer_id')
+        serviceman_id = request.POST.get('serviceman_id')
+        cost = request.POST.get('cost')
+        ispaid = request.POST.get('is_paid')
+        department = request.POST.get('department')
+        completed = request.POST.get('completed')
+        rating = request.POST.get('rating')
+        feedback = request.POST.get('feedback')
+        given_request = Request(requestid = requestid, 
+                                accepted = accepted    ,
+                                customer_id = customer_id,
+                                serviceman_id = serviceman_id,
+                                cost = cost,
+                                ispaid = ispaid,
+                                department = department,
+                                completed = completed,
+                                rating = rating,
+                                feedback = feedback
+                                )
+        given_request.save()
+        context = {"message": "Successful", "class": "OK","status":201}
+        return render(request, "shop/new_request.html", context)
+
+def staff_request(request):    
+    if request.method == 'GET':
+        all_request = Request.objects.all()
+        context = {"requests": all_request}
+        return render(request,"shop/staff_page.html",context)
+    if request.method == 'POST':
+        requestid = request.POST.get('requestid')
+        accepted = request.POST.get('accepted')
+        customer_id = request.POST.get('customer_id')
+        serviceman_id = request.POST.get('serviceman_id')
+        cost = request.POST.get('cost')
+        ispaid = request.POST.get('is_paid')
+        department = request.POST.get('department')
+        completed = request.POST.get('completed')
+        rating = request.POST.get('rating')
+        feedback = request.POST.get('feedback')
+        given_request = Request(requestid = requestid, 
+                                accepted = accepted    ,
+                                customer_id = customer_id,
+                                serviceman_id = serviceman_id,
+                                cost = cost,
+                                ispaid = ispaid,
+                                department = department,
+                                completed = completed,
+                                rating = rating,
+                                feedback = feedback
+                                )
+        given_request.save()
+        context = {"message": "Successful", "class": "OK","status":201}
+        # context = {"message": "No request found", "class": "danger","status":404}
+        return render(request, "shop/staff_page.html", context)
+
+
