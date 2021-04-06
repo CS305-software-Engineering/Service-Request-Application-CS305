@@ -229,24 +229,27 @@ def add_request(request):
         image_type = "The output" ## Output
         return image_type
 
-
+    if request.method == 'GET':
+        all_request = Request.objects.all()
+        context = {"requests": all_request}
+        return render(request,"shop/staff_page.html",context)
     if request.method == 'POST':
-        requestid = request.POST.get('requestid')
+#         requestid = request.POST.get('requestid')
         accepted = request.POST.get('accepted')
-        customer_id = request.POST.get('customer_id')
-        serviceman_id = request.POST.get('serviceman_id')
-        cost = request.POST.get('cost')
-        ispaid = request.POST.get('is_paid')
+#         customer_id = request.POST.get('customer_id')
+#         serviceman_id = request.POST.get('serviceman_id')
+#         cost = request.POST.get('cost')
+#         ispaid = request.POST.get('is_paid')
         department = request.POST.get('department')
         completed = request.POST.get('completed')
         rating = request.POST.get('rating')
         feedback = request.POST.get('feedback')
-        given_request = Request(requestid = requestid, 
+        given_request = Request(
                                 accepted = accepted    ,
-                                customer_id = customer_id,
-                                serviceman_id = serviceman_id,
-                                cost = cost,
-                                ispaid = ispaid,
+                                
+                               
+                               
+                               
                                 department = department,
                                 completed = completed,
                                 rating = rating,
@@ -262,26 +265,24 @@ def staff_request(request):
         context = {"requests": all_request}
         return render(request,"shop/staff_page.html",context)
     if request.method == 'POST':
-        requestid = request.POST.get('requestid')
+#         requestid = request.POST.get('requestid')
         accepted = request.POST.get('accepted')
-        customer_id = request.POST.get('customer_id')
-        serviceman_id = request.POST.get('serviceman_id')
+#         customer_id = request.POST.get('customer_id')
+#         serviceman_id = request.POST.get('serviceman_id')
         cost = request.POST.get('cost')
-        ispaid = request.POST.get('is_paid')
+#         ispaid = request.POST.get('is_paid')
         department = request.POST.get('department')
         completed = request.POST.get('completed')
-        rating = request.POST.get('rating')
-        feedback = request.POST.get('feedback')
-        given_request = Request(requestid = requestid, 
+#         rating = request.POST.get('rating')
+#         feedback = request.POST.get('feedback')
+        given_request = Request( 
                                 accepted = accepted    ,
-                                customer_id = customer_id,
-                                serviceman_id = serviceman_id,
+                               
                                 cost = cost,
-                                ispaid = ispaid,
+                               
                                 department = department,
                                 completed = completed,
-                                rating = rating,
-                                feedback = feedback
+                               
                                 )
         given_request.save()
         context = {"message": "Successful", "class": "OK","status":201}
