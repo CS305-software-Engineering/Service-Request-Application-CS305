@@ -199,15 +199,29 @@ def user_request(request):
 
     return render(request, 'shop/user_page.html', context)
 
-def request_page(request):
+def feedback_page(request):
     if request.method == 'POST':
         request_id = request.POST['request']
+        request.session['request_id'] = request_id
         service_request = Request.objects.filter(requestid = request_id).first()
         context = {
             'service_request' : service_request
         }
 
-        return render(request, 'shop/request_page.html', context)
+        return render(request, 'shop/feedback_page.html', context)
+
+def thankyou_page(request):
+    if request.method == "POST":
+        request_id = request.session['request_id']
+        service_request = Request.objects.filter(requestid = request_id).first()
+
+        service_request.feedback = request.POST['feedback']
+        service_request.rating = request.POST['rating']
+        service_request.save()
+        
+        context = {"message": "Successful", "class": "OK","status":201}
+
+        return render(request, 'shop/thankyou_page.html', context)
 
 def add_request(request):
     def classicication(image):
