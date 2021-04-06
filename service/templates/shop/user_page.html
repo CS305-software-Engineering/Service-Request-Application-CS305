@@ -25,8 +25,11 @@
             <td>{{ request.completed }}</td>
             <td>{{ request.rating }}</td>
             <td>{{ request.feedback }}</td>
-            
+            {% if reqeust.completed %}
             <td><button type="submit" value="{{ request.requestid }}" name="request">Add Feedback</button></td>
+            {% else %}
+            <td>Request not completed yet!</td>
+            {% endif %}
         {% endfor %}
     </table>
 </form>
