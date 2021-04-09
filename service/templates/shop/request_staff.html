@@ -19,13 +19,14 @@
             
         </tr>
         {% for request in requests %}
+            <!-- {% if %} -->
             <td>{{ request.requestid }}</td>
             <td>{{ request.address }}</td>
             <td>{{ request.description }}</td>
             <td><input type="text" class="form-control" id="DoA" placeholder="Enter Y/N"></td>
             <td><input type="text" class="form-control" id="Yes/No" placeholder="Enter Y/N"></td>
             <td><input type="date" class="form-control" id="DoA" placeholder="Date of Appointment"></td>
-            
+            <!-- {% endif %} -->
         {% endfor %}
     </table>
    <br><centre> <button type="submit" class="btn btn-primary">Submit</button></>

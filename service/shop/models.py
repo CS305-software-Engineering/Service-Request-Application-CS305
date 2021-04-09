@@ -35,4 +35,5 @@ class Request(models.Model):
     completed = models.BooleanField(default=False,editable=True)
     rating = models.FloatField(default=-1)
     feedback = models.CharField(default='_',max_length=500)
+    address = models.CharField(default='_',max_length=500)
 
