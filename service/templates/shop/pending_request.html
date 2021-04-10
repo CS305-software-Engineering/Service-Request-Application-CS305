@@ -1,0 +1,32 @@
+{% extends "header.html" %}
+{% block body_content %}
+
+<br>
+<h2>List of Pending Requests</h2>
+
+<br><br>
+
+
+    {% csrf_token %}
+    <table class="table">
+        <tr>
+            <th>Request ID</th>
+            <th>Address</th>
+            <th>Description</th>
+            <th>No. of Visits</th>
+            <th>Comments</th>
+            <th>Next Date of Appointment</th>
+            
+        </tr>
+        {% for request in requests %}
+            <td>{{ request.requestid }}</td>
+            <td>{{ request.address }}</td>
+            <td>{{ request.description }}</td>
+            <td>{{ request.numvisits }}</td>
+            <td>{{ request.comments }}</td>
+            <td>{{ request.nextDoA }}</td>
+            
+        {% endfor %}
+    </table>
+
+{% endblock %}
