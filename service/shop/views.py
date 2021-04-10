@@ -223,12 +223,14 @@ def thankyou_page(request):
 
         return render(request, 'shop/thankyou_page.html', context)
 
-def add_request(request):
-    def classicication(image):
-        ## Code for image classification
-        image_type = "The output" ## Output
-        return image_type
 
+def classification(image):
+    ## Code for image classification
+    image_type = "The output" ## Output
+    return image_type
+
+def add_request(request):
+    
     if request.method == 'GET':
         all_request = Request.objects.all()
         context = {"requests": all_request}
@@ -246,10 +248,6 @@ def add_request(request):
         feedback = request.POST.get('feedback')
         given_request = Request(
                                 accepted = accepted    ,
-                                
-                               
-                               
-                               
                                 department = department,
                                 completed = completed,
                                 rating = rating,
@@ -277,9 +275,7 @@ def staff_request(request):
 #         feedback = request.POST.get('feedback')
         given_request = Request( 
                                 accepted = accepted    ,
-                               
                                 cost = cost,
-                               
                                 department = department,
                                 completed = completed,
                                
