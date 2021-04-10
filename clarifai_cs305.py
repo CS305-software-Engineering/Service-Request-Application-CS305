@@ -1,5 +1,4 @@
 from clarifai.rest import ClarifaiApp
-import os
 from PIL import Image
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError

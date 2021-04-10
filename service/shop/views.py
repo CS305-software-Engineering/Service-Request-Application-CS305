@@ -13,6 +13,12 @@ import random
 import http.client
 from django.http import HttpResponse
 
+try:
+    app = ClarifaiApp(api_key="")
+except:
+    print("Please provide a valid API KEY for Image classification Clarifai API")
+    exit()
+
 # Create your views here.
 def send_otp(mobile, otp):
     # conn = http.client.HTTPSConnection("api.msg91.com")
@@ -227,11 +233,7 @@ def thankyou_page(request):
 
         return render(request, 'shop/thankyou_page.html', context)
 
-try:
-    app = ClarifaiApp()
-except:
-    print("Please provide a valid API KEY for Image classification Clarifai API")
-    exit()
+
 ######## This function takes a public url of the image and sends the predictions ################
 def get_tags_from_url(image_url):
     response_data = app.tag_urls([image_url])
@@ -294,32 +296,42 @@ def classification(image_path):
             return "electrical"
 
 def add_request(request):
-    
     if request.method == 'GET':
         all_request = Request.objects.all()
         context = {"requests": all_request}
-        return render(request,"shop/staff_page.html",context)
+        return render(request,"shop/add_request.html",context)
     if request.method == 'POST':
 #         requestid = request.POST.get('requestid')
-        accepted = request.POST.get('accepted')
-#         customer_id = request.POST.get('customer_id')
+        # accepted = request.POST.get('accepted')
+        # customer_id = request.POST.get('customer_id')
+        typee = request.session.get('type')
+        image = request.POST.get("img")
+        dept_drop = request.POST.get("dropDownDept")
+        car = request.POST.get("carSelected")
+        print("type => ",typee)
+        print("image=>",image)
+        print("dept_drop =>", dept_drop)
+        print("car =>",car)
+        dept = "default_dept"
+        # dept = classification(image)
+        # print("department predicted =>",department)
 #         serviceman_id = request.POST.get('serviceman_id')
 #         cost = request.POST.get('cost')
 #         ispaid = request.POST.get('is_paid')
-        department = request.POST.get('department')
-        completed = request.POST.get('completed')
-        rating = request.POST.get('rating')
-        feedback = request.POST.get('feedback')
+        department = request.POST.get('department',"_")
+        # completed = request.POST.get('completed')
+        # rating = request.POST.get('rating')
+        # feedback = request.POST.get('feedback')
         given_request = Request(
-                                accepted = accepted    ,
+                                # accepted = accepted    ,
                                 department = department,
-                                completed = completed,
-                                rating = rating,
-                                feedback = feedback
+                                # completed = completed,
+                                # rating = rating,
+                                # feedback = feedback
                                 )
         given_request.save()
         context = {"message": "Successful", "class": "OK","status":201}
-        return render(request, "shop/new_request.html", context)
+        return render(request, "shop/add_request.html", context)
 
 def staff_request(request):    
     if request.method == 'GET':
