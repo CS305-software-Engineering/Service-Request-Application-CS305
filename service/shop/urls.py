@@ -1,5 +1,6 @@
 from shop.views import *
 from django.urls import path, include
+from django.conf.urls.static import static
 from .views import login_attempt,login_otp,register,otp,register_sevice,home,staff_request, user_request, add_request, feedback_page, thankyou_page
 
 urlpatterns = [
@@ -15,3 +16,5 @@ urlpatterns = [
     path('feedback_page', feedback_page, name='feedback_page'),
     path('thankyou', thankyou_page, name='thankyou_page'),
 ]
+if settings.DEBUG:
+        urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

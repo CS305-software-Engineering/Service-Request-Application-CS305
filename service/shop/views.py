@@ -17,7 +17,7 @@ try:
     app = ClarifaiApp(api_key="")
 except:
     print("Please provide a valid API KEY for Image classification Clarifai API")
-    exit()
+    #exit()
 
 # Create your views here.
 def send_otp(mobile, otp):
@@ -296,41 +296,49 @@ def classification(image_path):
             return "electrical"
 
 def add_request(request):
+    context={}
     if request.method == 'GET':
         all_request = Request.objects.all()
         context = {"requests": all_request}
         return render(request,"shop/add_request.html",context)
-    if request.method == 'POST':
+    if request.method == 'POST' and 'checkimage' in request.POST:
 #         requestid = request.POST.get('requestid')
         # accepted = request.POST.get('accepted')
         # customer_id = request.POST.get('customer_id')
-        typee = request.session.get('type')
         image = request.POST.get("img")
-        dept_drop = request.POST.get("dropDownDept")
-        car = request.POST.get("carSelected")
-        print("type => ",typee)
-        print("image=>",image)
-        print("dept_drop =>", dept_drop)
-        print("car =>",car)
-        dept = "default_dept"
-        # dept = classification(image)
-        # print("department predicted =>",department)
-#         serviceman_id = request.POST.get('serviceman_id')
-#         cost = request.POST.get('cost')
-#         ispaid = request.POST.get('is_paid')
-        department = request.POST.get('department',"_")
-        # completed = request.POST.get('completed')
-        # rating = request.POST.get('rating')
-        # feedback = request.POST.get('feedback')
-        given_request = Request(
-                                # accepted = accepted    ,
-                                department = department,
-                                # completed = completed,
-                                # rating = rating,
-                                # feedback = feedback
-                                )
-        given_request.save()
-        context = {"message": "Successful", "class": "OK","status":201}
+        category=classification(image)
+        context.update({'category': category})
+#         typee = request.session.get('type')
+#         image = request.POST.get("img")
+#         dept_drop = request.POST.get("dropDownDept")
+#         car = request.POST.get("carSelected")
+#         print("type => ",typee)
+#         print("image=>",image)
+#         print("dept_drop =>", dept_drop)
+#         print("car =>",car)
+#         dept = "default_dept"
+#         # dept = classification(image)
+#         # print("department predicted =>",department)
+# #         serviceman_id = request.POST.get('serviceman_id')
+# #         cost = request.POST.get('cost')
+# #         ispaid = request.POST.get('is_paid')
+#         department = request.POST.get('department',"_")
+#         # completed = request.POST.get('completed')
+#         # rating = request.POST.get('rating')
+#         # feedback = request.POST.get('feedback')
+#         given_request = Request(
+#                                 # accepted = accepted    ,
+#                                 department = department,
+#                                 # completed = completed,
+#                                 # rating = rating,
+#                                 # feedback = feedback
+#                                 )
+#         given_request.save()
+#         context = {"message": "Successful", "class": "OK","status":201}
+#         if 'checkimage' in request.POST:
+#             image = request.POST.get("img")
+#             category=classification(image)
+#             context.update({'category': category})
         return render(request, "shop/add_request.html", context)
 
 def staff_request(request):    
