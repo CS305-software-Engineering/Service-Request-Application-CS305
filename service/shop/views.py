@@ -277,8 +277,8 @@ def classification(image_path):
         except:
             return "invalid PATH of the image file, kindly enter exact path of the image file or image url"
 
-    plumber_set = ['faucet','pipes','pipe','shower','water']
-    electrical_set = ['electrical','electronics','power','appliance']  
+    plumber_set = ['faucet','pipes','pipe','shower','water','washcloset','bathroom','water closet','flush','bathtub','plumbing','wet']
+    electrical_set = ['electrical','electronics','power','appliance','wire','connection','switch','electricity','lamp','ceiling','fan','heater']  
     score_plumber = 0
     score_electrical =0
     for tag in tags:
@@ -308,6 +308,24 @@ def add_request(request):
         image = request.POST.get("img")
         category=classification(image)
         context.update({'category': category})
+    
+    if request.method == 'POST' and 'submit_request' in request.POST:
+        current_user = request.user
+        print(current_user.id)
+        department=request.POST.get('department')
+        address=request.POST.get('address')
+        given_request = Request(customer_id=current_user.id,department=department,address=address)
+        given_request.save()
+        context = {"message": "Successful", "class": "OK","status":201}
+    
+    return render(request, "shop/add_request.html", context)
+#                                 # accepted = accepted    ,
+#                                 department = department,
+#                                 # completed = completed,
+#                                 # rating = rating,
+#                                 # feedback = feedback
+#                                 )
+#         given_request.save()
 #         typee = request.session.get('type')
 #         image = request.POST.get("img")
 #         dept_drop = request.POST.get("dropDownDept")
@@ -326,7 +344,7 @@ def add_request(request):
 #         # completed = request.POST.get('completed')
 #         # rating = request.POST.get('rating')
 #         # feedback = request.POST.get('feedback')
-#         given_request = Request(
+         # given_request = Request(
 #                                 # accepted = accepted    ,
 #                                 department = department,
 #                                 # completed = completed,
@@ -339,7 +357,7 @@ def add_request(request):
 #             image = request.POST.get("img")
 #             category=classification(image)
 #             context.update({'category': category})
-        return render(request, "shop/add_request.html", context)
+        
 
 def staff_request(request):    
     if request.method == 'GET':
@@ -349,7 +367,7 @@ def staff_request(request):
     if request.method == 'POST':
 #         requestid = request.POST.get('requestid')
         accepted = request.POST.get('accepted')
-#         customer_id = request.POST.get('customer_id')
+#        customer_id = request.POST.get('customer_id')
 #         serviceman_id = request.POST.get('serviceman_id')
         cost = request.POST.get('cost')
 #         ispaid = request.POST.get('is_paid')
