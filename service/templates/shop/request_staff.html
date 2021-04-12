@@ -2,7 +2,7 @@
 {% block body_content %}
 
 <br>
-<h2>List of Requests</h2>
+<h2>Accepted Requests</h2>
 
 <br><br>
 
@@ -13,22 +13,33 @@
             <th>Request ID</th>
             <th>Address</th>
             <th>Description</th>
-            <th>Yes/No</th>
-            <th>Confirm Y/N</th>
+            <!-- <th>Yes/No</th> -->
+            <!-- <th>Confirm Y/N</th> -->
             <th>Date of Appointment</th>
+            <th>Next Date of Appointment</th>
+            <th></th>
             
         </tr>
         {% for request in requests %}
             {% comment %} <!-- {% if %} --> {% endcomment %}
+            <tr>
+        <form method="POST">
+            {% csrf_token %}
             <td>{{ request.requestid }}</td>
             <td>{{ request.address }}</td>
             <td>{{ request.description }}</td>
-            <td><input type="text" class="form-control" id="DoA" placeholder="Enter Y/N"></td>
-            <td><input type="text" class="form-control" id="Yes/No" placeholder="Enter Y/N"></td>
-            <td><input type="date" class="form-control" id="DoA" placeholder="Date of Appointment"></td>
+            <td>{{request.doa}} </td>
+            <!-- <td><input type="text" class="form-control" id="DoA" placeholder="Enter Y/N"></td> -->
+            <!-- <td><input type="text" class="form-control" id="Yes/No" placeholder="Enter Y/N"></td> -->
+            <td><input type="date" class="form-control" id="DoA" name="DoA" placeholder="Date of Appointment"></td>
+            <input type="hidden" name="id" value="{{request.requestid}}"/>
+            <td><button type="submit" class="btn btn-primary">update</td>
             {% comment %} <!-- {% endif %} --> {% endcomment %}
+        </form>
+            </tr>
         {% endfor %}
     </table>
-   <br><centre> <button type="submit" class="btn btn-primary">Submit</button></>
+   <br>
+   <!-- <centre> <button type="submit" class="btn btn-primary">Submit</button></> -->
 </form>
 {% endblock %}

@@ -19,6 +19,7 @@
             <th>Add Feedback</th>
         </tr>
         {% for request in requests %}
+        <tr>
             <td>{{ request.requestid }}</td>
             <td>{{ request.serviceman_id }}</td>
             <td>{{ request.department }}</td>
@@ -29,6 +30,7 @@
             <td><button type="submit" value="{{ request.requestid }}" name="request">Add Feedback</button></td>
             {% else %}
             <td>Request not completed yet!</td>
+        </tr>
             {% endif %}
         {% endfor %}
     </table>

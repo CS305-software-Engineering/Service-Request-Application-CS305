@@ -45,7 +45,7 @@ def login_attempt(request):
         print(user)
         service_man = serviceman.objects.filter(phone = phone).first()
         print(service_man)
-        if user is None and service_man is not None:
+        if user is None and service_man is not None: # is a service_man
             otp = str(random.randint(1000, 9999))
             service_man.otp = otp
             service_man.save()
@@ -54,7 +54,7 @@ def login_attempt(request):
             request.session['type'] = 2
             return redirect('login_otp')
 
-        elif user is not None and service_man is None:
+        elif user is not None and service_man is None: # is a end user
             otp = str(random.randint(1000, 9999))
             user.otp = otp
             user.save()
@@ -62,7 +62,7 @@ def login_attempt(request):
             request.session['phone'] = phone
             request.session['type'] = 1
             return redirect('login_otp')
-        else:
+        else: # none
             context = {'message': 'User not found', 'class': 'danger'}
             return render(request, 'accounts/login.html', context)
 
@@ -166,6 +166,7 @@ def otp(request):
     return render(request, "accounts/otp.html", context) 
 
 def register_sevice(request):
+    
     if request.method == "POST":
         email = request.POST.get('email')
         company_name = request.POST.get('company_name')
@@ -214,6 +215,11 @@ def serviceman_request(request):
     context = {
         'requests' : service_requests
     }
+    if request.method=='POST':
+        dateApp = request.POST.get('DoA')
+        id = request.POST.get('id')
+        Request.objects.filter(requestid = id).update(doa = dateApp)
+        context.update({"message":"Next doa added successfully"})
 
     return render(request, 'shop/request_staff.html', context)
 
@@ -226,9 +232,14 @@ def feedback_page(request):
             'service_request' : service_request
         }
 
-        return render(request, 'shop/feedback_page.html', context)
+    return render(request, 'shop/feedback_page.html', context)
 
 def thankyou_page(request):
+    phone = request.session['phone']
+    print(phone)
+    # type_ = request.session['type']
+    context = {'message':'Successful'}
+
     if request.method == "POST":
         request_id = request.session['request_id']
         service_request = Request.objects.filter(requestid = request_id).first()
@@ -239,7 +250,7 @@ def thankyou_page(request):
         
         context = {"message": "Successful", "class": "OK","status":201}
 
-        return render(request, 'shop/thankyou_page.html', context)
+    return render(request, 'shop/thankyou_page.html', context)
 
 
 ######## This function takes a public url of the image and sends the predictions ################
@@ -285,8 +296,8 @@ def classification(image_path):
         except:
             return "invalid PATH of the image file, kindly enter exact path of the image file or image url"
 
-    plumber_set = ['faucet','pipes','pipe','shower','water','washcloset','bathroom','water closet','flush','bathtub','plumbing','wet']
-    electrical_set = ['electrical','electronics','power','appliance','wire','connection','switch','electricity','lamp','ceiling','fan','heater']  
+    plumber_set = ['faucet','pipes','pipe','shower','wash','basin','water','washcloset','bathroom','water closet','flush','bathtub','steel','plumber','plumbing','wet']
+    electrical_set = ['electrical','electronics','power','appliance','computer','conditioner','technology','wire','connection','switch','electricity','lamp','ceiling','fan','heater']  
     score_plumber = 0
     score_electrical =0
     for tag in tags:
@@ -322,6 +333,10 @@ def add_request(request):
         print(current_user.id)
         department=request.POST.get('department')
         address=request.POST.get('address')
+        deptnew = request.POST.get('dept')
+        print(deptnew)
+        if(deptnew != "select department" and deptnew!=""): #overriding the prediction by ML model
+            department = deptnew
         given_request = Request(customer_id=current_user.id,department=department,address=address)
         given_request.save()
         context = {"message": "Successful", "class": "OK","status":201}
@@ -375,7 +390,8 @@ def staff_request(request):
     if request.method == 'POST':
         requestid = request.POST.get('id')
         current_user = request.user
-        Request.objects.filter(requestid=requestid).update(accepted=1,serviceman_id=current_user.id)
+        dateofapp = request.POST.get('DoA')
+        Request.objects.filter(requestid=requestid).update(accepted=1,serviceman_id=current_user.id,doa = dateofapp)
         #print("Its here")
 #         requestid = request.POST.get('requestid')
 #         accepted = request.POST.get('accepted')

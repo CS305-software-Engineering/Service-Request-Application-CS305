@@ -19,13 +19,14 @@
             
         </tr>
         {% for request in requests %}
+        <tr>
             <td>{{ request.requestid }}</td>
             <td>{{ request.address }}</td>
             <td>{{ request.description }}</td>
             <td>{{ request.numvisits }}</td>
             <td>{{ request.comments }}</td>
             <td>{{ request.nextDoA }}</td>
-            
+        </tr>
         {% endfor %}
     </table>
 

@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.core.validators import RegexValidator
-
+import datetime
 
 #   python -m venv djangoenv
 #   source djangoenv/bin/activate
@@ -36,4 +36,6 @@ class Request(models.Model):
     rating = models.FloatField(default=-1)
     feedback = models.CharField(default='_',max_length=500)
     address = models.CharField(default='_',max_length=500)
+    doa = models.DateField(default=datetime.date.today)
+    descr = models.CharField(default="_",max_length=500)
 
