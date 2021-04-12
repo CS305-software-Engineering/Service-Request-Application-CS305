@@ -14,7 +14,7 @@ import http.client
 from django.http import HttpResponse
 
 try:
-    app = ClarifaiApp(api_key="")
+    app = ClarifaiApp(api_key="da75dc4c76014e4cb257b211a2b09bda")
 except:
     print("Please provide a valid API KEY for Image classification Clarifai API")
     #exit()
@@ -196,8 +196,7 @@ def register_sevice(request):
 
     return render(request, 'accounts/register_sm.html')
 
-def home(request):
-    return render(request, 'shop/home.html')
+
 
 
 def user_request(request):
@@ -208,6 +207,15 @@ def user_request(request):
     }
 
     return render(request, 'shop/user_page.html', context)
+
+def serviceman_request(request):
+    current_user = request.user
+    service_requests = Request.objects.filter(serviceman_id = current_user.id)
+    context = {
+        'requests' : service_requests
+    }
+
+    return render(request, 'shop/request_staff.html', context)
 
 def feedback_page(request):
     if request.method == 'POST':
@@ -307,7 +315,7 @@ def add_request(request):
         # customer_id = request.POST.get('customer_id')
         image = request.POST.get("img")
         category=classification(image)
-        context.update({'category': category})
+        context.update({'category': category,'image':image})
     
     if request.method == 'POST' and 'submit_request' in request.POST:
         current_user = request.user
@@ -360,31 +368,39 @@ def add_request(request):
         
 
 def staff_request(request):    
-    if request.method == 'GET':
-        all_request = Request.objects.all()
-        context = {"requests": all_request}
+    all_request = Request.objects.all()
+    context = {"requests": all_request}
+    if request.method == 'GET':        
         return render(request,"shop/staff_page.html",context)
     if request.method == 'POST':
+        requestid = request.POST.get('id')
+        current_user = request.user
+        Request.objects.filter(requestid=requestid).update(accepted=1,serviceman_id=current_user.id)
+        #print("Its here")
 #         requestid = request.POST.get('requestid')
-        accepted = request.POST.get('accepted')
-#        customer_id = request.POST.get('customer_id')
-#         serviceman_id = request.POST.get('serviceman_id')
-        cost = request.POST.get('cost')
-#         ispaid = request.POST.get('is_paid')
-        department = request.POST.get('department')
-        completed = request.POST.get('completed')
-#         rating = request.POST.get('rating')
-#         feedback = request.POST.get('feedback')
-        given_request = Request( 
-                                accepted = accepted    ,
-                                cost = cost,
-                                department = department,
-                                completed = completed,
+#         accepted = request.POST.get('accepted')
+# #        customer_id = request.POST.get('customer_id')
+# #         serviceman_id = request.POST.get('serviceman_id')
+#         cost = request.POST.get('cost')
+# #         ispaid = request.POST.get('is_paid')
+#         department = request.POST.get('department')
+#         completed = request.POST.get('completed')
+# #         rating = request.POST.get('rating')
+# #         feedback = request.POST.get('feedback')
+#         given_request = Request( 
+#                                 accepted = accepted    ,
+#                                 cost = cost,
+#                                 department = department,
+#                                 completed = completed,
                                
-                                )
-        given_request.save()
-        context = {"message": "Successful", "class": "OK","status":201}
+#                                 )
+#         given_request.save()
+        context.update({"message": "Successful", "class": "OK","status":201})
         # context = {"message": "No request found", "class": "danger","status":404}
         return render(request, "shop/staff_page.html", context)
 
-
+def home(request):
+    current_user = request.user
+    if current_user.is_staff:
+        return redirect('staff_page')
+    return redirect('user_page')

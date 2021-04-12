@@ -8,11 +8,17 @@
   <div class="collapse navbar-collapse" id="navbarText">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item active">
-        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+        <a class="nav-link" href="{% url 'home' %}">Home <span class="sr-only">(current)</span></a>
       </li>
+      {% if user.is_staff %}
       <li class="nav-item">
-        <a class="nav-link" href="#">Features</a>
+        <a class="nav-link" href="{% url 'serviceman_request' %}">My Requests</a>
       </li>
+      {% else %}
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'add_request' %}">Add Request</a>
+      </li>
+      {% endif %}
       <li class="nav-item">
         <a class="nav-link" href="#">Pricing</a>
       </li>

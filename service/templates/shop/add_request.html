@@ -56,7 +56,7 @@
           {% csrf_token %}
             <label for="img">Select image:</label>
             <!-- <input type="file" id="img" name="img" accept="image/*"> -->
-            <input type="text" id="img" name="img" placeholder="enter exact file path of the image" size="80%">
+            <input type="text" id="img" name="img" placeholder="enter exact file path of the image" size="80%" value="{{ image }}">
             <input type="submit" name="checkimage" value="check">
             <p>{{ category }}</p>
             <!-- <input -->
