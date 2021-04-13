@@ -6,7 +6,7 @@
 
 <br><br>
 
-<form action = "feedback_page" method="post">
+<form method="post">
     {% csrf_token %}
     <table class="table">
         <tr>
@@ -17,19 +17,28 @@
             <th>Rating</th>
             <th>Feedback</th>
             <th>Add Feedback</th>
+            <th></th>
         </tr>
         {% for request in requests %}
         <tr>
+            
             <td>{{ request.requestid }}</td>
             <td>{{ request.serviceman_id }}</td>
             <td>{{ request.department }}</td>
             <td>{{ request.completed }}</td>
+            {%if request.rating == -1%}
+            <td> _ </td>
+            {%else%}
             <td>{{ request.rating }}</td>
+            {%endif%}
             <td>{{ request.feedback }}</td>
-            {% if reqeust.completed %}
-            <td><button type="submit" value="{{ request.requestid }}" name="request">Add Feedback</button></td>
-            {% else %}
-            <td>Request not completed yet!</td>
+            <!-- <td>Request not completed yet</td> -->
+            <td><a class="btn btn-outline-primary" href="/feedback_page/{{request.requestid}}" role="button">update</a></td>
+            <!-- <td><button>hello</button></td> -->
+            <!-- {% if request.completed %} -->
+            <!-- <td><button type="submit" value="{{ request.requestid }}" name="request">Add Feedback</button></td> -->
+            <!-- {% else %} -->
+            
         </tr>
             {% endif %}
         {% endfor %}

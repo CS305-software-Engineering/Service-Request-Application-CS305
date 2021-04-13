@@ -13,7 +13,7 @@ urlpatterns = [
     path('staff_page', staff_request, name='staff_page'),
     path('user_page', user_request, name='user_page'),
     path('add_request', add_request, name='add_request'),
-    path('feedback_page', feedback_page, name='feedback_page'),
+    path('feedback_page/<int:requestid>', feedback_page, name='feedback_page'),
     path('thankyou', thankyou_page, name='thankyou_page'),
     path('serviceman_request',serviceman_request,name='serviceman_request'),
 ]

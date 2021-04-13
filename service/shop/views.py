@@ -223,11 +223,18 @@ def serviceman_request(request):
 
     return render(request, 'shop/request_staff.html', context)
 
-def feedback_page(request):
+def feedback_page(request,requestid):
+    context={}
     if request.method == 'POST':
-        request_id = request.POST['request']
-        request.session['request_id'] = request_id
-        service_request = Request.objects.filter(requestid = request_id).first()
+        # request_id = request.POST['request']
+        request.session['request_id'] = requestid
+        comment = request.POST.get('feedback')
+        rating = request.POST.get('rating')
+        service_request = Request.objects.filter(requestid = requestid)
+        print("service_request =>",service_request)
+        print(comment)
+        print(rating)
+        service_request.update(feedback = comment,rating = rating)
         context = {
             'service_request' : service_request
         }
