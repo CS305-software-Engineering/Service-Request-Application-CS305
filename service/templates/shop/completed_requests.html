@@ -1,0 +1,32 @@
+{% extends "header.html" %}
+{% block body_content %}
+
+<br>
+<h2>List of Completed Requests</h2>
+
+<br><br>
+
+
+    {% csrf_token %}
+    <table class="table">
+        <tr>
+            <th>Request ID</th>
+            <th>Address</th>
+            <th>Description</th>
+            <th>No. of Visits</th>
+            <th>Completed On</th>
+            
+            
+        </tr>
+        {% for request in requests %}
+        <tr>
+            <td>{{ request.requestid }}</td>
+            <td>{{ request.address }}</td>
+            <td>{{ request.description }}</td>
+            <td>{{ request.numvisits }}</td>
+            <td>{{ request.completedOn }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}

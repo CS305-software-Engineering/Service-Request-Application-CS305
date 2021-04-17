@@ -1,0 +1,41 @@
+{% extends "header.html" %}
+{% block body_content %}
+
+<br>
+<h2>List of Incoming Requests</h2>
+
+<br><br>
+
+<form method="post">
+    {% csrf_token %}
+    <h3>New requests</h3>
+    <table class="table">
+        <tr>
+            <th>Request ID</th>
+            <th>Address</th>
+            <th>Department</th>
+            <!-- <th>Yes/No</th> -->
+            <th>Date of Appointment</th>
+            <th></th>
+            
+        </tr>
+        {% for request in requests %}
+             {% if request.accepted == -1 %}
+                <tr>
+                    <td>{{ request.requestid }}</td>
+                    <td>{{ request.address }}</td>
+                    <td>{{ request.department }}</td>
+                    <!-- <td><input type="text" class="form-control" id="DoA" placeholder="Enter Y/N"></td> -->
+                    {% comment %} <td><input type="text" class="form-control" id="Yes/No" placeholder="Enter Y/N"></td> {% endcomment %}
+                    <td><input type="date" class="form-control" id="DoA" name="DoA" placeholder="Date of Appointment"></td>
+                    <input type="hidden" value="{{request.requestid}}" name="id" />
+                    <td><button type="submit" class="btn btn-primary">Accept</button></td>
+                </tr>
+            {% endif %} 
+        {% endfor %}
+    </table>
+   <br>
+   <!-- <centre>  -->
+    <!-- <button type="submit" class="btn btn-primary">Submit</button> -->
+</form>
+{% endblock %}
