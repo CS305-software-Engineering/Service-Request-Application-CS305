@@ -40,77 +40,45 @@ def send_otp(mobile, otp):
 def login_attempt(request):
     if request.method == "POST":
         phone = request.POST.get('phone')
+        password = request.POST.get('password')
 
-        user = EndUser.objects.filter(phone=phone).first()
-        print(user)
+        end_user = EndUser.objects.filter(phone=phone).first()
+        print(end_user)
         service_man = serviceman.objects.filter(phone = phone).first()
         print(service_man)
-        if user is None and service_man is not None: # is a service_man
-            otp = str(random.randint(1000, 9999))
-            service_man.otp = otp
-            service_man.save()
-            send_otp(phone, otp)
-            request.session['phone'] = phone
-            request.session['type'] = 2
-            return redirect('login_otp')
 
-        elif user is not None and service_man is None: # is a end user
-            otp = str(random.randint(1000, 9999))
-            user.otp = otp
-            user.save()
-            send_otp(phone, otp)
-            request.session['phone'] = phone
-            request.session['type'] = 1
-            return redirect('login_otp')
+        if end_user is None and service_man is not None: # is a service_man
+            user = authenticate(request, username=phone, password=password)
+            if user is not None:
+                login(request, user)
+                request.session['phone'] = phone
+                request.session['type'] = 2
+                return redirect('home')
+            else:
+                context = {"message" : "Password Incorrect", "class": 'danger'}
+                return render(request, 'accounts/login.html', context)
+
+        elif end_user is not None and service_man is None: # is a end user
+            user = authenticate(request, username = phone, password = password)
+            if user is not None:
+                login(request, user)
+                request.session['phone'] = phone
+                request.session['type'] = 1
+                return redirect('home')
+            else:
+                context = {"message" : "Password Incorrect", "class": 'danger'}
+                return render(request, 'accounts/login.html', context)
+
         else: # none
-            context = {'message': 'User not found', 'class': 'danger'}
+            context = {'message': 'User not found, please Register first', 'class': 'danger'}
             return render(request, 'accounts/login.html', context)
 
-        # otp = str(random.randint(1000, 9999))
-        # user.otp = otp
-        # user.save()
-        # send_otp(phone, otp)
-
-        # request.session['phone'] = phone
-        # return redirect('login_otp')
-
     return render(request, 'accounts/login.html')
-
-def login_otp(request):
-    phone = request.session['phone']
-    type_ = request.session['type']
-    context = {'phone': phone}
-
-    if request.method == "POST":
-        otp = request.POST.get('otp')
-        if type_==1:
-            user = EndUser.objects.filter(phone=phone).first()
-
-            if otp == user.otp:
-                user = User.objects.get(id = user.user.id)
-                login(request, user)
-                return redirect('home')
-            else:
-                context = {'message': 'Wrong OTP', 'class': 'danger', 'phone': phone}
-                return render(request, 'accounts/login_otp.html', context)
-
-        else:
-            service_man = serviceman.objects.filter(phone=phone).first()
-
-            if otp == service_man.otp:
-                user = User.objects.get(id = service_man.user.id)
-                login(request, user)
-                return redirect('home')
-            else:
-                context = {'message': 'Wrong OTP', 'class': 'danger', 'phone': phone}
-                return render(request, 'accounts/login_otp.html', context)
-
-
-    return render(request, 'accounts/login_otp.html', context)
 
 def register(request):
     if request.method == "POST":
         email = request.POST.get('email')
+        password = request.POST.get('password')
         name = request.POST.get('name')
         phone = request.POST.get('phone')
 
@@ -121,54 +89,23 @@ def register(request):
             context = {'message': 'User already exists', 'class': 'danger'}
             return render(request, 'accounts/register.html', context)
 
-        user = User(username = phone, email = email, first_name = name)
+        user = User.objects.create_user(username = phone, email = email, first_name = name, password = password)
         user.save()
 
-        otp = str(random.randint(1000, 9999))
-        enduser = EndUser(user = user, phone = phone, otp = otp)
+        enduser = EndUser(user = user, phone = phone)
         enduser.save()
 
-        send_otp(phone, otp)
         request.session['phone'] = phone
         request.session['type'] = 1
-        return redirect('otp')
+        return redirect(login_attempt)
 
     return render(request, 'accounts/register.html')
-
-def otp(request):
-    phone = request.session["phone"]
-    type_ = request.session['type']
-    context = {'phone' : phone,'type':type_}
-
-    if request.method == "POST":
-        otp = request.POST.get('otp')
-        if type_== 1:
-            enduser = EndUser.objects.filter(phone = phone).first()
-
-            if otp == enduser.otp:
-                user = User.objects.get(id = enduser.user.id)
-                login(request, user)
-                return redirect('home')
-            else:
-                context = {"message": "Wrong OTP", "class": "danger", "phone": phone,"type":type_}
-                return render(request, "accounts/otp.html", context)
-        else:
-            service_man = serviceman.objects.filter(phone = phone).first()
-
-            if otp == service_man.otp:
-                user = User.objects.get(id = service_man.user.id)
-                login(request, user)
-                return redirect('home')
-            else:
-                context = {"message": "Wrong OTP", "class": "danger", "phone": phone,"type":type_}
-                return render(request, "accounts/otp.html", context)
-
-    return render(request, "accounts/otp.html", context) 
 
 def register_sevice(request):
     
     if request.method == "POST":
         email = request.POST.get('email')
+        password = request.POST.get('password')
         company_name = request.POST.get('company_name')
         phone = request.POST.get('phone')
         is_plumber=request.POST.get('is_plumber')=="on"
@@ -183,17 +120,15 @@ def register_sevice(request):
             context = {'message': 'User already exists', 'class': 'danger'}
             return render(request, 'accounts/register_sm.html', context)
 
-        user = User(username = phone, email = email, first_name = company_name)
+        user = User.objects.create_user(username = phone, email = email, first_name = company_name, password = password)
         user.save()
 
-        otp = str(random.randint(1000, 9999))
-        service_man = serviceman(user = user, phone = phone, otp = otp,is_plumber=is_plumber,is_electrician=is_electrician,is_mechanic=is_mechanic,other_services=other_services,company_name=company_name)
+        service_man = serviceman(user = user, phone = phone,is_plumber=is_plumber,is_electrician=is_electrician,is_mechanic=is_mechanic,other_services=other_services,company_name=company_name)
         service_man.save()
 
-        send_otp(phone, otp)
         request.session['phone'] = phone
         request.session['type'] = 2
-        return redirect('otp')
+        return redirect(login_attempt)
 
     return render(request, 'accounts/register_sm.html')
 
