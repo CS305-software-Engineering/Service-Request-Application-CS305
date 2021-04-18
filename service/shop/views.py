@@ -49,6 +49,7 @@ def login_attempt(request):
 
         if end_user is None and service_man is not None: # is a service_man
             user = authenticate(request, username=phone, password=password)
+            print(user)
             if user is not None:
                 login(request, user)
                 request.session['phone'] = phone
@@ -150,11 +151,17 @@ def serviceman_request(request):
     context = {
         'requests' : service_requests
     }
-    if request.method=='POST':
+    if request.method=='POST' and 'updatedoa' in request.POST:
         dateApp = request.POST.get('DoA')
         id = request.POST.get('id')
         Request.objects.filter(requestid = id).update(doa = dateApp)
         context.update({"message":"Next doa added successfully"})
+    
+    if request.method=='POST' and 'complete' in request.POST:
+        #dateApp = request.POST.get('DoA')
+        id = request.POST.get('id')
+        Request.objects.filter(requestid = id).update(completed = True)
+        context.update({"message":"Request marked as completed"})
 
     return render(request, 'shop/request_staff.html', context)
 

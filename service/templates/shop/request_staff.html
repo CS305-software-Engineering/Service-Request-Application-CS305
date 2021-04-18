@@ -18,7 +18,7 @@
             <th>Date of Appointment</th>
             <th>Next Date of Appointment</th>
             <th></th>
-            
+            <th></th>
         </tr>
         {% for request in requests %}
             {% comment %} <!-- {% if %} --> {% endcomment %}
@@ -31,9 +31,16 @@
             <td>{{request.doa}} </td>
             <!-- <td><input type="text" class="form-control" id="DoA" placeholder="Enter Y/N"></td> -->
             <!-- <td><input type="text" class="form-control" id="Yes/No" placeholder="Enter Y/N"></td> -->
-            <td><input type="date" class="form-control" id="DoA" name="DoA" placeholder="Date of Appointment"></td>
+            {% comment %} <td><input type="date" class="form-control" id="DoA" name="DoA" placeholder="Date of Appointment"></td> {% endcomment %}
             <input type="hidden" name="id" value="{{request.requestid}}"/>
-            <td><button type="submit" class="btn btn-primary">update</td>
+            {% comment %} <td><button type="submit" name="updatedoa" class="btn btn-primary">update</td> {% endcomment %}
+            {% if request.completed %}
+            <td>Completed</td>
+            {% else %}
+            <td><button type="submit" name="updatedoa" class="btn btn-primary">update</td>
+            <td><input type="date" class="form-control" id="DoA" name="DoA" placeholder="Date of Appointment"></td>
+            <td><button type="submit" name="complete"class="btn btn-primary">Press if completed</td>
+            {% endif %}
             {% comment %} <!-- {% endif %} --> {% endcomment %}
         </form>
             </tr>
