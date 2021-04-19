@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 import os
 load_dotenv()
 
-from shop.models import EndUser,serviceman,Request
+from shop.models import EndUser,serviceman,Request,Appointments
 
 import random
 import http.client
@@ -267,6 +267,8 @@ def classification(image_path):
         else:
             return "electrical"
 
+
+
 def add_request(request):
     context={}
     if request.method == 'GET':
@@ -334,6 +336,31 @@ def add_request(request):
 #             category=classification(image)
 #             context.update({'category': category})
         
+#this view will be responsible for
+# 1.) GET - Viewing all the appointments of a request with given request id, 
+#           with corresponding fields of remarks and date of appointment
+# 2.) POST- will be used for passing the remarks from the enduser and service staff 
+#           for a particular visit/appointment
+
+def appointments(request):
+    context = {}
+    
+    if request.method=="GET":
+        date = request.GET.get('DoA')
+        id = request.GET.get('id')
+        all_appointments = Appointments.objects.filter(requestid=id)
+        context = {"appointments":all_appointments}
+        return render(request,"shop/appointments.html",context)
+    
+    if request.method=="POST":
+        date = request.GET.get('DoA')
+        id = request.GET.get('id')
+        purpose = request.GET.get('purpose')
+        remarksfromuser = request.GET.get('remarksFromUser')
+        remarskfromstaff = request.GET.get('remarksFromStaff')
+        #### to be discussed and completed
+        return render(request,"shop/appointments.html",context)
+
 
 def staff_request(request):    
     all_request = Request.objects.all()

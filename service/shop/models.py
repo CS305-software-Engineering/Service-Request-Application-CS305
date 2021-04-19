@@ -37,3 +37,12 @@ class Request(models.Model):
     doa = models.DateField(default=datetime.date.today)
     descr = models.CharField(default="_",max_length=500)
 
+class Appointments(models.Model):
+    requestid = models.CharField(blank=False,max_length=50)
+    doa = models.DateField(blank=False)
+    purpose = models.CharField(max_length=100,default="")
+    remark_from_staff = models.CharField(max_length=200,default="")
+    remark_from_user  = models.CharField(max_length=200,default="")
+
+    class Meta:
+        unique_together = (("requestid", "doa"),)

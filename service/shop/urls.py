@@ -1,4 +1,4 @@
-from shop.views import *
+from .views import *
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.views.generic.base import RedirectView
@@ -15,6 +15,7 @@ urlpatterns = [
     path('feedback_page/<int:requestid>', feedback_page, name='feedback_page'),
     path('thankyou', thankyou_page, name='thankyou_page'),
     path('serviceman_request',serviceman_request,name='serviceman_request'),
+    path('appointments',appointments,name="appointments")
 ]
 
 if settings.DEBUG:
