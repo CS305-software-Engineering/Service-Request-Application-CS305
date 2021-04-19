@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 import os
 load_dotenv()
 
-from shop.models import EndUser,serviceman,Request,Appointments
+from .models import EndUser,serviceman,Request,Appointments
 
 import random
 import http.client
@@ -343,12 +343,16 @@ def add_request(request):
 #           for a particular visit/appointment
 
 def appointments(request):
-    context = {}
-    
+    # context = {}
+    all_appointments = Appointments.objects.all()
+    context = {"appointments":all_appointments}
     if request.method=="GET":
-        date = request.GET.get('DoA')
-        id = request.GET.get('id')
-        all_appointments = Appointments.objects.filter(requestid=id)
+        # date = request.GET.get('DoA')
+        # id = request.GET.get('id')
+        # id_appointments = Appointments.objects.filter(requestid=id)
+        print("inside GET ReQUEST for appointments")
+        all_appointments = Appointments.objects.all()
+        print(len(all_appointments))
         context = {"appointments":all_appointments}
         return render(request,"shop/appointments.html",context)
     
@@ -369,9 +373,14 @@ def staff_request(request):
         return render(request,"shop/staff_page.html",context)
     if request.method == 'POST':
         requestid = request.POST.get('id')
+        print("===========================\n",request.POST)
         current_user = request.user
         dateofapp = request.POST.get('DoA')
+        purpose = request.POST.get('purpose',"Initial Inspection")
+        print("=====================\ndate=",dateofapp,"\nrequestid=",requestid)
         Request.objects.filter(requestid=requestid).update(accepted=1,serviceman_id=current_user.id,doa = dateofapp)
+        newappointment = Appointments(requestid=requestid,doa=dateofapp,purpose=purpose)
+        newappointment.save()
         #print("Its here")
 #         requestid = request.POST.get('requestid')
 #         accepted = request.POST.get('accepted')

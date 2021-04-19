@@ -14,7 +14,33 @@
     <title>Appointments</title>
 </head>
 <body>
-
+    
+    <br>
+    <div style="padding:2%">
+    <table class="table">
+    <tr>
+        <th>Request ID</th>
+        <th>Date of Appointment</th>
+        <th>Purpose</th>
+        <th>Remarks from EndUser</th>
+        <th>Remarks from Service-staff</th>
+        <!-- <th></th>
+        <th>Add Feedback</th>
+        <th></th> -->
+    </tr>
+    {% for app in appointments %}
+        <tr>
+            
+            <td>{{ app.requestid }}</td>
+            <td>{{ app.doa }}</td>
+            <td>{{ app.purpose }}</td>
+            <td>{{ app.remark_from_user }}</td>
+            <td>{{ app.remark_from_staff }}</td>
+            
+        </tr>
+    {% endfor %}
+    </table>
+    </div>
 </body>
 </html>
 
