@@ -14,7 +14,7 @@ import http.client
 from django.http import HttpResponse
 
 try:
-    app = ClarifaiApp(api_key="da75dc4c76014e4cb257b211a2b09bda")
+    app = ClarifaiApp(api_key="")
 except:
     print("Please provide a valid API KEY for Image classification Clarifai API")
     #exit()
