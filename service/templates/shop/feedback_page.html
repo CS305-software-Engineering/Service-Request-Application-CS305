@@ -1,0 +1,38 @@
+{% extends "header.html" %}
+{% block body_content %}
+
+<br>
+<div style="padding-left:1%">
+<h3> Add Feedback</h3>
+</div>
+<hr>
+<br>
+
+<div style="width: 40%; padding: 1%">
+    <form method="POST" id="feedbackform">
+        {% csrf_token %}
+        <div  class='form-group'>
+            <label for="rating">Rating:</label>
+            <input type="number" id="rating" name="rating" min="1" max="5" class="form-control" placeholder="value between 1 to 5"></input>
+        </div>
+        <br>
+        
+        <div class='form-group'>
+            <label for="feedback">Feedback for our service:</label>
+            <textarea name="feedback" rows="4" cols="50" class="form-control" form="feedbackform" placeholder="enter your feedback"></textarea>        
+        </div>
+
+        <br>
+        <div class='form-group'>
+        <!-- <a href="/thankyou/"> -->
+            <input type="submit" value="submit"/>
+        <!-- </a> -->
+        </div>
+    </form>
+    <!-- <div style="padding: 1%">
+    <label for="feedback">Feedback for our service:</label>
+    <textarea id="feedback" name="feedback" rows="4" cols="50" class="form-control" placeholder="enter your feedback"></textarea>
+    </div> -->
+</div>
+
+{% endblock %}

@@ -1,3 +1,7 @@
+# settings.py
+./service/service/settings.py
+./service/service/views.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
