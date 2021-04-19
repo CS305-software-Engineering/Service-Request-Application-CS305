@@ -288,7 +288,7 @@ def add_request(request):
             department = deptnew
         given_request = Request(customer_id=current_user.id,department=department,address=address)
         given_request.save()
-        context = {"message": "Successful", "class": "OK","status":201}
+        context = {"message": "Request added successfully", "class": "success","status":201}
     
     return render(request, "shop/add_request.html", context)
 #                                 # accepted = accepted    ,

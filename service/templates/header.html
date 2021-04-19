@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <a class="navbar-brand" href="#">Service Request Application</a>
+  <a class="navbar-brand" href="#">
+  <img src="images/icon.png" alt="" width="30" height="24" class="d-inline-block align-text-top">
+  Service Request Application</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -12,27 +14,27 @@
         <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
       </li> -->
       {% if user.is_staff %}
-      <li class="nav-item active">
+      <li class="nav-item {% if request.resolver_match.url_name == 'staff_page' %}active{% endif %}">
         <a class="nav-link" href="{% url 'staff_page' %}">Home <span class="sr-only">(current)</span></a>
       </li>
       {% else %}
-      <li class="nav-item active">
-        <a class="nav-link" href="/user_page">Home<span class='sr-only'>(current)</span></a>
+      <li class="nav-item {% if request.resolver_match.url_name == 'user_page' %}active{% endif %}">
+        <a class="nav-link" href="{% url 'user_page' %}">Home<span class='sr-only'>(current)</span></a>
       </li>
       {% endif %}
 
       {% if user.is_staff %}
-      <li class="nav-item">
-        <a class="nav-link active" href="{% url 'serviceman_request' %}">My Requests</a>
+      <li class="nav-item {% if request.resolver_match.url_name == 'serviceman_request' %}active{% endif %}">
+        <a class="nav-link" href="{% url 'serviceman_request' %}">My Requests</a>
       </li>
       {% else %}
-      <li class="nav-item active">
+      <li class="nav-item {% if request.resolver_match.url_name == 'add_request' %}active{% endif %}">
         <a class="nav-link" href="{% url 'add_request' %}">Add Request</a>
       </li>
       {% endif %}
-      <li class="nav-item">
+      {% comment %} <li class="nav-item">
         <a class="nav-link" href="#">Pricing</a>
-      </li>
+      </li> {% endcomment %}
       {% if user.is_authenticated %}
       <li class="nav-item">
         <a class="nav-link" href="{% url 'logout' %}">Logout</a>
@@ -40,7 +42,7 @@
       {% endif %}
     </ul>
     <span class="navbar-text">
-      Welcome
+      Welcome {{user.username}}
     </span>
   </div>
 </nav>
