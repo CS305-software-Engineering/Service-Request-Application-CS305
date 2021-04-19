@@ -6,6 +6,9 @@ from clarifai.rest import ClarifaiApp
 from PIL import Image
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
 from shop.models import EndUser,serviceman,Request
 
@@ -14,7 +17,8 @@ import http.client
 from django.http import HttpResponse
 
 try:
-    app = ClarifaiApp(api_key="")
+    keykey = os.environ.get('CLARIFAI_API_KEY')
+    app = ClarifaiApp(api_key=keykey)
 except:
     print("Please provide a valid API KEY for Image classification Clarifai API")
     #exit()
