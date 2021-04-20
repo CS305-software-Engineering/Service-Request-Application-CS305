@@ -44,9 +44,11 @@
             <!-- <td><button type="submit" name="updatedoa" class="btn btn-primary">View Details</td> -->
             <td><a class="btn btn-outline-primary" href="/appointments/{{request.requestid}}" role="button">view details</a></td>
             <!-- <td><input type="date" class="form-control" id="DoA" name="DoA" placeholder="Date of Appointment"></td> -->
-            
-            <td><button type="submit" name="complete"class="btn btn-primary">Press if completed</td>
-            
+            {% if not request.completed %}
+            <td><button type="submit" name="complete"class="btn btn-success">Press if completed</td>
+            {%else%}
+            <td></td>
+            {%endif%}
             {% comment %} <!-- {% endif %} --> {% endcomment %}
         </form>
         </tr>

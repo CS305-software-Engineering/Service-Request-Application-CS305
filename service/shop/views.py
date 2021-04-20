@@ -10,6 +10,7 @@ from django.core.files.storage import FileSystemStorage
 from dotenv import load_dotenv
 import os
 import datetime
+from dateutil.parser import parse
 load_dotenv()
 
 from .models import EndUser,serviceman,Request,Appointments
@@ -146,8 +147,8 @@ def user_request(request):
     current_user = request.user
     service_requests = Request.objects.filter(customer_id = current_user.id)
     # print(service_requests)
-    for i in service_requests:
-        print(i.requestid,i.rating,i.feedback)
+    # for i in service_requests:
+    #     print(i.requestid,i.rating,i.feedback)
     context = {
         'requests' : service_requests
     }
@@ -364,8 +365,12 @@ def appointments(request,reqid):
     # print("*****************************\nreqid =",reqid)
     # req_object = Request.objects.filter(requestid=reqid)[0]
     # all_appointments = Appointments.objects.filter(requestid=req_object)
-    context = {'reqid':reqid}
+
+
     req_object = Request.objects.filter(requestid=reqid)[0]
+    isCompleted = req_object.completed
+    all_appointments = Appointments.objects.filter(requestid=req_object)
+    context = {'reqid':reqid,"isCompleted":isCompleted,"appointments":all_appointments}
     if request.method=="GET":
         # date = request.GET.get('DoA')
         # id = request.GET.get('id')
@@ -393,6 +398,24 @@ def appointments(request,reqid):
             print(purpose)
             newapp = Appointments(requestid = req_object,doa=dateofapp,purpose=purpose)
             newapp.save()
+        else:
+            date = request.POST.get('DoA')
+            date = parse(date).date()
+            # print(date, type(date))
+            app_object = Appointments.objects.filter(requestid=req_object, doa=date)
+            # print("see here , ", app_object, len(app_object), app_object[0].doa)
+            # id = request.POST.get('id')
+            # purpose = request.POST.get('purpose')
+            remarksfromuser = request.POST.get('remarksFromUser')
+            remarksfromstaff = request.POST.get('remarksFromStaff')
+            print("remarks here \n\n\n\n\n", remarksfromstaff, remarksfromuser)
+            if remarksfromuser != None:
+                # req_object.remark_from_user = remarksfromuser
+                app_object.update(remark_from_user = remarksfromuser)
+            if remarksfromstaff != None:
+                # req_object.remark_from_staff = remarksfromstaff
+                app_object.update(remark_from_staff = remarksfromstaff)
+            print("\n\nnew remarks saved\n\n")
         #### to be discussed and completed
         
         all_appointments = Appointments.objects.filter(requestid=req_object)
@@ -405,7 +428,8 @@ def appointments(request,reqid):
                 nextdoa = app.doa
                 break
         context.update({"nextdoa":nextdoa})
-        req_object.update(doa=nextdoa)
+        Request.objects.filter(requestid=reqid).update(doa=nextdoa)
+        ##### endtrigger
         return render(request,"shop/appointments.html",context)
 
 
@@ -420,6 +444,10 @@ def staff_request(request):
         current_user = request.user
         dateofapp = request.POST.get('DoA')
         purpose = request.POST.get('purpose',"Initial Inspection")
+        # print("=====================\ndate=",dateofapp,"\nrequestid=",requestid)
+        # Request.objects.filter(requestid=requestid).update(accepted=1,serviceman_id=current_user.id,doa = dateofapp)
+        # newappointment = Appointments(requestid=requestid,doa=dateofapp,purpose=purpose)
+        # newappointment.save()
         print("=====================\ndate=",dateofapp,"\nrequestid=",requestid)
         Request.objects.filter(requestid=requestid).update(accepted=1,serviceman_id=current_user.id,doa = dateofapp)
         req_object = Request.objects.filter(requestid=requestid)[0]

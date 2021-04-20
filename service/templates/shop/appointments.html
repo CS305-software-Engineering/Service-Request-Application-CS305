@@ -19,13 +19,13 @@
     <div style="padding:2%">
     <table class="table">
     <tr>
-        <thead class="thead-light">
+    <thead class="thead-light">
         <th>Request ID</th>
         <th>Date of Appointment</th>
         <th>Purpose</th>
         <th>Remarks from EndUser</th>
         <th>Remarks from Service-staff</th>
-        <th></tr>
+        <th>Action</th>
         <!-- <th></th>
         <th>Add Feedback</th>
         <th></th> -->
@@ -33,28 +33,36 @@
     </tr>
     {% for app in appointments %}
         <tr>
-            
+        <form method="POST">  
+        {% csrf_token %}  
             <td>{{ app.requestid.requestid }}</td>
             <td>{{ app.doa }}</td>
             <td>{{ app.purpose }}</td>
-            {% if user.is_staff %}
+            <input type='hidden' name = 'DoA'value = '{{app.doa}}' />    
+        {% if user.is_staff %}
+            <!-- <td>{{ app.remark_from_user }}</td> -->
             <td><input disabled type="text" class="form-control" id="remarksFromUser" name="remarksFromUser" value="{{app.remark_from_user}}"></input></td>
-            {%else%}
-            <td><input type="text" class="form-control" id="remarksFromUser" name="remarksFromUser" value="{{app.remark_from_user}}"></input></td>
-            {%endif%}
+            
+        {%else%}
+            <td><input type="text" id="remarksFromUser" class="form-control" name="remarksFromUser" value="{{app.remark_from_user}}"></input></td>
+            
+        {%endif%}
 
-            {% if user.is_staff %}
-            <td><input type="text" class="form-control" id="remarksFromStaff" name="remarksFromStaff" value="{{app.remark_from_staff}}"></input></td>
-            {%else%}
+        {% if user.is_staff %}
+            <td><input type="text" id="remarksFromStaff" class="form-control" name="remarksFromStaff" value="{{app.remark_from_staff}}"></input></td>
+            <td><button type="submit" class="btn btn-primary">Add Remarks</td>
+        {%else%}
+            <!-- <td>{{ app.remark_from_staff }}</td> -->
             <td><input disabled type="text" class="form-control" id="remarksFromUser" name="remarksFromUser" value="{{app.remark_from_staff}}"></td>
-            {%endif%}
-            <td></td>
+            <td><button type="submit" class="btn btn-primary">Add Remarks</td>
+        {%endif%}
+            <!-- <td></td> -->
             <!-- <td>{{ app.remark_from_user }}</td>
             <td>{{ app.remark_from_staff }}</td> -->
-            
+        </form>
         </tr>
     {% endfor %}
-        {% if user.is_staff %}
+        {% if user.is_staff and not isCompleted %}
         <tr>
         <form method="POST">
         {% csrf_token %}

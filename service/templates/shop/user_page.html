@@ -14,7 +14,7 @@
             <th>Request ID</th>
             <th>Service-Man ID</th>
             <th>Department</th>
-            <th>Completed</th>
+            <th>Status</th>
             <th>Rating</th>
             <th>Feedback</th>
             <th>Add Feedback</th>
@@ -27,7 +27,11 @@
             <td>{{ request.requestid }}</td>
             <td>{{ request.serviceman_id }}</td>
             <td>{{ request.department }}</td>
-            <td>{{ request.completed }}</td>
+            {% if request.completed %}
+            <td>Completed</td>
+            {%else%}
+            <td>In Progress</td>
+            {%endif%}
             {%if request.rating == -1%}
             <td> _ </td>
             {%else%}
@@ -36,7 +40,13 @@
             
             <td>{{ request.feedback }}</td>
             <!-- <td>Request not completed yet</td> -->
-            <td><a class="btn btn-outline-primary" href="/feedback_page/{{request.requestid}}" role="button">update</a></td>
+            {% if request.completed %}
+            <td><a class="btn btn-outline-primary" href="/feedback_page/{{request.requestid}}" role="button">Add</a></td>
+            {%else%}
+            <td></td>
+            {%endif%}
+
+            
             <td><a class="btn btn-outline-secondary" href="/appointments/{{request.requestid}}" role="button">Click here</a></td>
             <!-- <td><button>hello</button></td> -->
             <!-- {% if request.completed %} -->
