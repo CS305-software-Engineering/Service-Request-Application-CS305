@@ -8,17 +8,19 @@
 
 <form action = "request_staff" method="post"></form>
     {% csrf_token %}
-    <table class="table">
+    <table class="table table-striped">
         <tr>
+        <thead class="table-dark">
             <th>Request ID</th>
             <th>Address</th>
             <th>Description</th>
             <!-- <th>Yes/No</th> -->
             <!-- <th>Confirm Y/N</th> -->
             <th>Date of Appointment</th>
+            <th></th>
             <th>Next Date of Appointment</th>
             <th></th>
-            <th></th>
+        </thead>
         </tr>
         {% for request in requests %}
             {% comment %} <!-- {% if %} --> {% endcomment %}

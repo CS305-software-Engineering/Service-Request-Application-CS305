@@ -285,12 +285,13 @@ def add_request(request):
         context.update({'category': category,'image':image})
         
         
-    if request.method == 'POST' and request.FILES['image']:
+    elif request.method == 'POST' and 'checkfile' in request.POST:
         image_uploaded = request.FILES['image']
         fs = FileSystemStorage()
         filename = fs.save(image_uploaded.name, image_uploaded)
         uploaded_file_url = fs.url(filename)
-        image = uploaded_file_url
+        image = '..'+uploaded_file_url
+        print(image)
         category=classification(image)
         context.update({'category': category ,'image':image})
 

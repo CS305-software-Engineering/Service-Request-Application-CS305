@@ -48,6 +48,12 @@
             <p>predicted department : {{ category }}</p>
             <!-- <input -->
             <div class="input-group">
+            <label for="img" class="col-sm-2 col-form-label">Select Image:</label>
+            <input type="file" class="form-control" name="image" id="file-input" aria-describedby="inputGroupFileAddon04" aria-label="Upload" accept="image/x-png,image/jpeg,image/jpg">
+            <!--<button class="btn btn-outline-secondary" type="button" id="inputGroupFileAddon04">Check</button>-->
+            <input type="submit" style="background: #7a802e73" class="btn btn-secondary" value="Check" name="checkfile"/>
+          </div>
+            {% comment %} <div class="input-group">
               <label for="img">Select image:</label>
               <!-- <input type="file" id="img" name="img" accept="image/*"> -->
               <input type="file" name="image" id="file-input" accept="image/x-png,image/jpeg,image/jpg"/>
@@ -55,12 +61,12 @@
               <!--<input type="submit" name="checkimage" value="check">-->
               <input type="submit" style="background: #7a802e73" class="btn btn-secondary" value="Check"/>
               <p>predicted department : {{ category }}</p>
-          </div>
-         <!-- <div class="mb-3 row">
+          </div> {% endcomment %}
+         <div class="mb-3 row">
             <label for="preddepartment" class="col-sm-2 col-form-label">Predicted Department</label>
             <div class="col-sm-10">
               <input type="text" readonly value="{{category}}" class="form-control" id="preddepartment">
-          </div>-->
+          </div>
   </div>
             <input type="hidden" name="department" value="{{ category }}">
             

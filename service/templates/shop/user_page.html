@@ -8,7 +8,8 @@
 
 <form method="post">
     {% csrf_token %}
-    <table class="table">
+    <table class="table table-striped">
+        <thead class="table-dark">
         <tr>
             <th>Request ID</th>
             <th>Service-Man ID</th>
@@ -19,6 +20,7 @@
             <th>Add Feedback</th>
             <th></th>
         </tr>
+        </thead>
         {% for request in requests %}
         <tr>
             
