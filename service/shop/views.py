@@ -355,7 +355,7 @@ def add_request(request):
 # 2.) POST- will be used for passing the remarks from the enduser and service staff 
 #           for a particular visit/appointment
 
-def appointments(request):
+def appointments(request,reqid):
     # context = {}
     all_appointments = Appointments.objects.all()
     context = {"appointments":all_appointments}
@@ -364,7 +364,10 @@ def appointments(request):
         # id = request.GET.get('id')
         # id_appointments = Appointments.objects.filter(requestid=id)
         print("inside GET ReQUEST for appointments")
-        all_appointments = Appointments.objects.all()
+        # all_appointments = Appointments.objects.all()
+
+        req_object = Request.objects.filter(requestid=reqid)
+        all_appointments = Appointments.objects.filter(requestid=req_object)
         print(len(all_appointments))
         context = {"appointments":all_appointments}
         return render(request,"shop/appointments.html",context)
@@ -376,6 +379,8 @@ def appointments(request):
         remarksfromuser = request.GET.get('remarksFromUser')
         remarskfromstaff = request.GET.get('remarksFromStaff')
         #### to be discussed and completed
+
+        
         return render(request,"shop/appointments.html",context)
 
 
@@ -390,9 +395,15 @@ def staff_request(request):
         current_user = request.user
         dateofapp = request.POST.get('DoA')
         purpose = request.POST.get('purpose',"Initial Inspection")
+        # print("=====================\ndate=",dateofapp,"\nrequestid=",requestid)
+        # Request.objects.filter(requestid=requestid).update(accepted=1,serviceman_id=current_user.id,doa = dateofapp)
+        # newappointment = Appointments(requestid=requestid,doa=dateofapp,purpose=purpose)
+        # newappointment.save()
         print("=====================\ndate=",dateofapp,"\nrequestid=",requestid)
         Request.objects.filter(requestid=requestid).update(accepted=1,serviceman_id=current_user.id,doa = dateofapp)
-        newappointment = Appointments(requestid=requestid,doa=dateofapp,purpose=purpose)
+        req_object = Request.objects.filter(requestid=requestid)[0]
+        
+        newappointment = Appointments(requestid=req_object,doa=dateofapp,purpose=purpose)
         newappointment.save()
         #print("Its here")
 #         requestid = request.POST.get('requestid')

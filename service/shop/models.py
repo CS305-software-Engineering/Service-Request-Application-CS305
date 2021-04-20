@@ -38,7 +38,7 @@ class Request(models.Model):
     descr = models.CharField(default="_",max_length=500)
 
 class Appointments(models.Model):
-    requestid = models.CharField(blank=False,max_length=50)
+    requestid = models.ForeignKey(Request, on_delete=models.CASCADE)
     doa = models.DateField(blank=False)
     purpose = models.CharField(max_length=100,default="",blank=True)
     remark_from_staff = models.CharField(max_length=200,default="",blank=True)
@@ -46,3 +46,4 @@ class Appointments(models.Model):
 
     class Meta:
         unique_together = (("requestid", "doa"),)
+        ordering = ['doa']
