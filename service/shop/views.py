@@ -6,6 +6,7 @@ from clarifai.rest import ClarifaiApp
 from PIL import Image
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
+from django.core.files.storage import FileSystemStorage
 from dotenv import load_dotenv
 import os
 load_dotenv()
@@ -282,6 +283,17 @@ def add_request(request):
         image = request.POST.get("img")
         category=classification(image)
         context.update({'category': category,'image':image})
+        
+        
+    if request.method == 'POST' and request.FILES['image']:
+        image_uploaded = request.FILES['image']
+        fs = FileSystemStorage()
+        filename = fs.save(image_uploaded.name, image_uploaded)
+        uploaded_file_url = fs.url(filename)
+        image = uploaded_file_url
+        category=classification(image)
+        context.update({'category': category ,'image':image})
+
     
     if request.method == 'POST' and 'submit_request' in request.POST:
         current_user = request.user
