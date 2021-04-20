@@ -34,8 +34,20 @@
             <td>{{ app.requestid }}</td>
             <td>{{ app.doa }}</td>
             <td>{{ app.purpose }}</td>
+            {% if user.is_staff %}
             <td>{{ app.remark_from_user }}</td>
+            {%else%}
+            <td><input type="text" id="remarksFromUser" name="remarksFromUser"></input></td>
+            {%endif%}
+
+            {% if user.is_staff %}
+            <td><input type="text" id="remarksFromStaff" name="remarksFromStaff"></input></td>
+            {%else%}
             <td>{{ app.remark_from_staff }}</td>
+            {%endif%}
+
+            <!-- <td>{{ app.remark_from_user }}</td>
+            <td>{{ app.remark_from_staff }}</td> -->
             
         </tr>
     {% endfor %}
