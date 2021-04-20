@@ -8,8 +8,9 @@
 
 
     <h3>New requests</h3>
-    <table class="table">
+    <table class="table table-striped">
         <tr>
+        <thead class="table-dark">
             <th>Request ID</th>
             <th>Address</th>
             <th>Department</th>
@@ -17,7 +18,7 @@
             <th>Date of Appointment</th>
             <th style="width:0%"></th>
             <th>Action</th>
-            
+        </thead>
         </tr>
         {% for request in requests %}
             {% if request.accepted == -1 %}
