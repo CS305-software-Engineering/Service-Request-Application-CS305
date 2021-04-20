@@ -24,6 +24,7 @@
         <th>Purpose</th>
         <th>Remarks from EndUser</th>
         <th>Remarks from Service-staff</th>
+        <th></tr>
         <!-- <th></th>
         <th>Add Feedback</th>
         <th></th> -->
@@ -35,17 +36,17 @@
             <td>{{ app.doa }}</td>
             <td>{{ app.purpose }}</td>
             {% if user.is_staff %}
-            <td>{{ app.remark_from_user }}</td>
+            <td><input disabled type="text" class="form-control" id="remarksFromUser" name="remarksFromUser" value="{{app.remark_from_user}}"></input></td>
             {%else%}
-            <td><input type="text" id="remarksFromUser" name="remarksFromUser"></input></td>
+            <td><input type="text" class="form-control" id="remarksFromUser" name="remarksFromUser" value="{{app.remark_from_user}}"></input></td>
             {%endif%}
 
             {% if user.is_staff %}
-            <td><input type="text" id="remarksFromStaff" name="remarksFromStaff"></input></td>
+            <td><input type="text" class="form-control" id="remarksFromStaff" name="remarksFromStaff" value="{{app.remark_from_staff}}"></input></td>
             {%else%}
-            <td>{{ app.remark_from_staff }}</td>
+            <td><input disabled type="text" class="form-control" id="remarksFromUser" name="remarksFromUser" value="{{app.remark_from_staff}}"></td>
             {%endif%}
-
+            <td></td>
             <!-- <td>{{ app.remark_from_user }}</td>
             <td>{{ app.remark_from_staff }}</td> -->
             
@@ -53,12 +54,17 @@
     {% endfor %}
         {% if user.is_staff %}
         <tr>
-            <td></td>
+        <form method="POST">
+        {% csrf_token %}
+            <td>{{reqid}}</td>
             <td><input type="date" class="form-control" id="DoA" name="DoA" placeholder="Date of Appointment"></td>
-            <td><input type="text" id="purpose" name="purpose" placeholder="purpose for the appointment"></td>
+            <td><input type="text" class="form-control" id="purpose" name="purpose" placeholder="purpose for the appointment"></td>
             <td></td>
             <td></td>
-
+            <input type="hidden" value="Yes" name="createNewAppointment">
+            <td><button type="submit" name="complete"class="btn btn-primary">Add new appointment</button></td>
+            
+        </form>
         </tr>
         {% endif %}
 

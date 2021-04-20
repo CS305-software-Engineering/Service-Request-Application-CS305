@@ -361,29 +361,41 @@ def add_request(request):
 def appointments(request,reqid):
     # context = {}
     # print("*****************************\nreqid =",reqid)
-    req_object = Request.objects.filter(requestid=reqid)
-    all_appointments = Appointments.objects.filter(requestid=req_object)
-    context = {"appointments":all_appointments}
+    # req_object = Request.objects.filter(requestid=reqid)[0]
+    # all_appointments = Appointments.objects.filter(requestid=req_object)
+    context = {'reqid':reqid}
+    req_object = Request.objects.filter(requestid=reqid)[0]
     if request.method=="GET":
         # date = request.GET.get('DoA')
         # id = request.GET.get('id')
         # id_appointments = Appointments.objects.filter(requestid=id)
         print("inside GET ReQUEST for appointments")
-        req_object = Request.objects.filter(requestid=reqid)[0]
+        
         # print("\n\nHERE ****************************> \n",req_object.serviceman_id,req_object.customer_id)
         all_appointments = Appointments.objects.filter(requestid=req_object)
         # print(len(all_appointments))
-        context = {"appointments":all_appointments}
+        context.update({"appointments":all_appointments})
         return render(request,"shop/appointments.html",context)
     
     if request.method=="POST":
-        date = request.GET.get('DoA')
-        id = request.GET.get('id')
-        purpose = request.GET.get('purpose')
-        remarksfromuser = request.GET.get('remarksFromUser')
-        remarskfromstaff = request.GET.get('remarksFromStaff')
+        # date = request.GET.get('DoA')
+        # id = request.GET.get('id')
+        # purpose = request.GET.get('purpose')
+        # remarksfromuser = request.GET.get('remarksFromUser')
+        # remarskfromstaff = request.GET.get('remarksFromStaff')
+
+        if('createNewAppointment' in request.POST):
+            print("-------------------creating new appointment--------------------")
+            purpose = request.POST.get('purpose',"")
+            dateofapp = request.POST.get('DoA')
+            print(dateofapp)
+            print(purpose)
+            newapp = Appointments(requestid = req_object,doa=dateofapp,purpose=purpose)
+            newapp.save()
         #### to be discussed and completed
         
+        all_appointments = Appointments.objects.filter(requestid=req_object)
+        context.update({"appointments":all_appointments})
         return render(request,"shop/appointments.html",context)
 
 
