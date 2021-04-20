@@ -4,8 +4,7 @@
 <br>
 <h2>Your Requested Services</h2>
 
-<br><br>
-
+<div class="conatiner">
 <form method="post">
     {% csrf_token %}
     <table class="table table-striped">
@@ -58,4 +57,5 @@
         {% endfor %}
     </table>
 </form>
+</div>
 {% endblock %}
