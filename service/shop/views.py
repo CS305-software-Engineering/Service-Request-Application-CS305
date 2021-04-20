@@ -10,6 +10,7 @@ from django.core.files.storage import FileSystemStorage
 from dotenv import load_dotenv
 import os
 import datetime
+from service.settings import MEDIA_ROOT
 from dateutil.parser import parse
 load_dotenv()
 
@@ -295,7 +296,7 @@ def add_request(request):
         fs = FileSystemStorage()
         filename = fs.save(image_uploaded.name, image_uploaded)
         uploaded_file_url = fs.url(filename)
-        image = '..'+uploaded_file_url
+        image = os.path.join(MEDIA_ROOT,filename)
         print(image)
         category=classification(image)
         context.update({'category': category ,'image':image})

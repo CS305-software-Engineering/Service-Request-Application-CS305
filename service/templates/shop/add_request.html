@@ -32,9 +32,9 @@
    <div class = "container">
         <form method="POST" enctype="multipart/form-data" >
           {% csrf_token %}
-
-          
           <div class="col-sm-10 input-group">
+          
+          {% comment %} <div class="col-sm-10 input-group">
           <label for="img" class="col-sm-2 col-form-label">Select Image:</label>
           <input type="text" class="form-control" id="img" name="img" placeholder="enter exact file path of the image" value="{{ image }}">
           <input type="submit" class="btn btn-outline-secondary" name="checkimage" value="check">
@@ -44,8 +44,8 @@
             {% comment %} <label for="img">Select image:</label>
             <!-- <input type="file" id="img" name="img" accept="image/*"> -->
             <input type="text" id="img" name="img" placeholder="enter exact file path of the image" size="80%" value="{{ image }}">
-            <input type="submit" name="checkimage" value="check"> {% endcomment %}
-            <p>predicted department : {{ category }}</p>
+            <input type="submit" name="checkimage" value="check">
+            <p>predicted department : {{ category }}</p> {% endcomment %}
             <!-- <input -->
             <div class="input-group">
             <label for="img" class="col-sm-2 col-form-label">Select Image:</label>
