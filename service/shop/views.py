@@ -9,6 +9,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from dotenv import load_dotenv
 import os
+import datetime
 load_dotenv()
 
 from .models import EndUser,serviceman,Request,Appointments
@@ -396,6 +397,15 @@ def appointments(request,reqid):
         
         all_appointments = Appointments.objects.filter(requestid=req_object)
         context.update({"appointments":all_appointments})
+        
+        #### trigger to update next date of appointment field in Request table
+        for app in all_appointments:
+            print("appointment date =",app.doa, "today = ",datetime.date.today())
+            if(app.doa >= datetime.date.today()):
+                nextdoa = app.doa
+                break
+        context.update({"nextdoa":nextdoa})
+        req_object.update(doa=nextdoa)
         return render(request,"shop/appointments.html",context)
 
 
