@@ -361,15 +361,18 @@ def add_request(request):
 def appointments(request,reqid):
     # context = {}
     # print("*****************************\nreqid =",reqid)
-    all_appointments = Appointments.objects.filter(requestid=reqid)
+    req_object = Request.objects.filter(requestid=reqid)
+    all_appointments = Appointments.objects.filter(requestid=req_object)
     context = {"appointments":all_appointments}
     if request.method=="GET":
         # date = request.GET.get('DoA')
         # id = request.GET.get('id')
         # id_appointments = Appointments.objects.filter(requestid=id)
         print("inside GET ReQUEST for appointments")
-        all_appointments = Appointments.objects.filter(requestid=reqid)
-        print(len(all_appointments))
+        req_object = Request.objects.filter(requestid=reqid)[0]
+        # print("\n\nHERE ****************************> \n",req_object.serviceman_id,req_object.customer_id)
+        all_appointments = Appointments.objects.filter(requestid=req_object)
+        # print(len(all_appointments))
         context = {"appointments":all_appointments}
         return render(request,"shop/appointments.html",context)
     
@@ -397,7 +400,9 @@ def staff_request(request):
         purpose = request.POST.get('purpose',"Initial Inspection")
         print("=====================\ndate=",dateofapp,"\nrequestid=",requestid)
         Request.objects.filter(requestid=requestid).update(accepted=1,serviceman_id=current_user.id,doa = dateofapp)
-        newappointment = Appointments(requestid=requestid,doa=dateofapp,purpose=purpose)
+        req_object = Request.objects.filter(requestid=requestid)[0]
+        
+        newappointment = Appointments(requestid=req_object,doa=dateofapp,purpose=purpose)
         newappointment.save()
         # print("Its here")
 #         requestid = request.POST.get('requestid')

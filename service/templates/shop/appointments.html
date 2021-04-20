@@ -31,7 +31,7 @@
     {% for app in appointments %}
         <tr>
             
-            <td>{{ app.requestid }}</td>
+            <td>{{ app.requestid.requestid }}</td>
             <td>{{ app.doa }}</td>
             <td>{{ app.purpose }}</td>
             {% if user.is_staff %}
@@ -51,6 +51,17 @@
             
         </tr>
     {% endfor %}
+        {% if user.is_staff %}
+        <tr>
+            <td></td>
+            <td><input type="date" class="form-control" id="DoA" name="DoA" placeholder="Date of Appointment"></td>
+            <td><input type="text" id="purpose" name="purpose" placeholder="purpose for the appointment"></td>
+            <td></td>
+            <td></td>
+
+        </tr>
+        {% endif %}
+
     </table>
     </div>
 </body>
