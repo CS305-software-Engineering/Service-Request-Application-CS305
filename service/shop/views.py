@@ -144,6 +144,9 @@ def register_sevice(request):
 def user_request(request):
     current_user = request.user
     service_requests = Request.objects.filter(customer_id = current_user.id)
+    # print(service_requests)
+    for i in service_requests:
+        print(i.requestid,i.rating,i.feedback)
     context = {
         'requests' : service_requests
     }
@@ -357,18 +360,27 @@ def add_request(request):
 
 def appointments(request,reqid):
     # context = {}
-    all_appointments = Appointments.objects.all()
+    # print("*****************************\nreqid =",reqid)
+    req_object = Request.objects.filter(requestid=reqid)
+    all_appointments = Appointments.objects.filter(requestid=req_object)
     context = {"appointments":all_appointments}
     if request.method=="GET":
         # date = request.GET.get('DoA')
         # id = request.GET.get('id')
         # id_appointments = Appointments.objects.filter(requestid=id)
         print("inside GET ReQUEST for appointments")
+<<<<<<< HEAD
         # all_appointments = Appointments.objects.all()
 
         req_object = Request.objects.filter(requestid=reqid)
         all_appointments = Appointments.objects.filter(requestid=req_object)
         print(len(all_appointments))
+=======
+        req_object = Request.objects.filter(requestid=reqid)[0]
+        # print("\n\nHERE ****************************> \n",req_object.serviceman_id,req_object.customer_id)
+        all_appointments = Appointments.objects.filter(requestid=req_object)
+        # print(len(all_appointments))
+>>>>>>> ffe878944441b5cfe9dab5562d262214be6b9658
         context = {"appointments":all_appointments}
         return render(request,"shop/appointments.html",context)
     
@@ -379,7 +391,10 @@ def appointments(request,reqid):
         remarksfromuser = request.GET.get('remarksFromUser')
         remarskfromstaff = request.GET.get('remarksFromStaff')
         #### to be discussed and completed
+<<<<<<< HEAD
 
+=======
+>>>>>>> ffe878944441b5cfe9dab5562d262214be6b9658
         
         return render(request,"shop/appointments.html",context)
 
@@ -405,7 +420,7 @@ def staff_request(request):
         
         newappointment = Appointments(requestid=req_object,doa=dateofapp,purpose=purpose)
         newappointment.save()
-        #print("Its here")
+        # print("Its here")
 #         requestid = request.POST.get('requestid')
 #         accepted = request.POST.get('accepted')
 # #        customer_id = request.POST.get('customer_id')

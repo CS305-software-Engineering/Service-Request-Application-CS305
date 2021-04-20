@@ -18,7 +18,7 @@
             <th>Rating</th>
             <th>Feedback</th>
             <th>Add Feedback</th>
-            <th></th>
+            <th>View Appointments</th>
         </tr>
         </thead>
         {% for request in requests %}
@@ -33,16 +33,18 @@
             {%else%}
             <td>{{ request.rating }}</td>
             {%endif%}
+            
             <td>{{ request.feedback }}</td>
             <!-- <td>Request not completed yet</td> -->
             <td><a class="btn btn-outline-primary" href="/feedback_page/{{request.requestid}}" role="button">update</a></td>
+            <td><a class="btn btn-outline-secondary" href="/appointments/{{request.requestid}}" role="button">Click here</a></td>
             <!-- <td><button>hello</button></td> -->
             <!-- {% if request.completed %} -->
             <!-- <td><button type="submit" value="{{ request.requestid }}" name="request">Add Feedback</button></td> -->
             <!-- {% else %} -->
             
         </tr>
-            {% endif %}
+            <!-- {% endif %} -->
         {% endfor %}
     </table>
 </form>
