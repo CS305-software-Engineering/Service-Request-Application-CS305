@@ -9,6 +9,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from dotenv import load_dotenv
 import os
+from dateutil.parser import parse
 load_dotenv()
 
 from .models import EndUser,serviceman,Request,Appointments
@@ -361,7 +362,7 @@ def add_request(request):
 def appointments(request,reqid):
     # context = {}
     # print("*****************************\nreqid =",reqid)
-    req_object = Request.objects.filter(requestid=reqid)
+    req_object = Request.objects.filter(requestid=reqid)[0]
     all_appointments = Appointments.objects.filter(requestid=req_object)
     context = {"appointments":all_appointments}
     if request.method=="GET":
@@ -369,32 +370,34 @@ def appointments(request,reqid):
         # id = request.GET.get('id')
         # id_appointments = Appointments.objects.filter(requestid=id)
         print("inside GET ReQUEST for appointments")
-<<<<<<< HEAD
         # all_appointments = Appointments.objects.all()
 
-        req_object = Request.objects.filter(requestid=reqid)
+        req_object = Request.objects.filter(requestid=reqid)[0]
         all_appointments = Appointments.objects.filter(requestid=req_object)
         print(len(all_appointments))
-=======
-        req_object = Request.objects.filter(requestid=reqid)[0]
-        # print("\n\nHERE ****************************> \n",req_object.serviceman_id,req_object.customer_id)
-        all_appointments = Appointments.objects.filter(requestid=req_object)
-        # print(len(all_appointments))
->>>>>>> ffe878944441b5cfe9dab5562d262214be6b9658
         context = {"appointments":all_appointments}
         return render(request,"shop/appointments.html",context)
     
     if request.method=="POST":
-        date = request.GET.get('DoA')
-        id = request.GET.get('id')
-        purpose = request.GET.get('purpose')
-        remarksfromuser = request.GET.get('remarksFromUser')
-        remarskfromstaff = request.GET.get('remarksFromStaff')
+        date = request.POST.get('DoA')
+        date = parse(date).date()
+        print(date, type(date))
+        app_object = Appointments.objects.filter(requestid=req_object, doa=date)
+        print("see here , ", app_object, len(app_object), app_object[0].doa)
+        id = request.POST.get('id')
+        purpose = request.POST.get('purpose')
+        remarksfromuser = request.POST.get('remarksFromUser')
+        remarksfromstaff = request.POST.get('remarksFromStaff')
+        print("remarks here \n\n\n\n\n", remarksfromstaff, remarksfromuser)
+        if remarksfromuser != None:
+            # req_object.remark_from_user = remarksfromuser
+            app_object.update(remark_from_user = remarksfromuser)
+        if remarksfromstaff != None:
+            # req_object.remark_from_staff = remarksfromstaff
+            app_object.update(remark_from_staff = remarksfromstaff)
+        print("niggga obj saved \n\n\n\n\n")
+        # req_object.save()
         #### to be discussed and completed
-<<<<<<< HEAD
-
-=======
->>>>>>> ffe878944441b5cfe9dab5562d262214be6b9658
         
         return render(request,"shop/appointments.html",context)
 

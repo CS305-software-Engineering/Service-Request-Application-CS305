@@ -24,31 +24,39 @@
         <th>Purpose</th>
         <th>Remarks from EndUser</th>
         <th>Remarks from Service-staff</th>
+        <th>Action</th>
         <!-- <th></th>
         <th>Add Feedback</th>
         <th></th> -->
     </tr>
     {% for app in appointments %}
         <tr>
-            
+            <form method="POST">  
+                {% csrf_token %}  
             <td>{{ app.requestid.requestid }}</td>
             <td>{{ app.doa }}</td>
             <td>{{ app.purpose }}</td>
+            <input type='hidden' name = 'DoA'value = '{{app.doa}}' />    
             {% if user.is_staff %}
-            <td>{{ app.remark_from_user }}</td>
+            <!-- <td>{{ app.remark_from_user }}</td> -->
+            <td><input disabled type="text" class="form-control" id="remarksFromUser" name="remarksFromUser" value="{{app.remark_from_user}}"></input></td>
+
             {%else%}
-            <td><input type="text" id="remarksFromUser" name="remarksFromUser"></input></td>
+            <td><input type="text" id="remarksFromUser" class="form-control" name="remarksFromUser" value="{{app.remark_from_user}}"></input></td>
+            <td><button type="submit" class="btn btn-primary">Add Remarks</td>
             {%endif%}
 
             {% if user.is_staff %}
-            <td><input type="text" id="remarksFromStaff" name="remarksFromStaff"></input></td>
+            <td><input type="text" id="remarksFromStaff" class="form-control" name="remarksFromStaff" value="{{app.remark_from_staff}}"></input></td>
+            <td><button type="submit" class="btn btn-primary">Add Remarks</td>
             {%else%}
-            <td>{{ app.remark_from_staff }}</td>
+            <!-- <td>{{ app.remark_from_staff }}</td> -->
+            <td><input disabled type="text" class="form-control" id="remarksFromUser" name="remarksFromUser" value="{{app.remark_from_staff}}"></td>
             {%endif%}
 
             <!-- <td>{{ app.remark_from_user }}</td>
             <td>{{ app.remark_from_staff }}</td> -->
-            
+            </form>
         </tr>
     {% endfor %}
         {% if user.is_staff %}
