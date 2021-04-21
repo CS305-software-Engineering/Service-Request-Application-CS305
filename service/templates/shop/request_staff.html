@@ -1,12 +1,27 @@
 {% extends "header.html" %}
 {% block body_content %}
+<script>
+var myModal = document.getElementById('staticBackdrop')
+var myInput = document.getElementById('myInput')
 
+myModal.addEventListener('shown.bs.modal', function () {
+  myInput.focus()
+})
+</script>
 <br>
+<div class="mt-4 col-md-12">
+    {% if message %}
+        <div class="alert alert-{{class}}">
+            {{message}}
+        </div>
+    {% endif %}
+
+    </div>
 <h3>Accepted Requests</h3>
 
 
-<form action = "request_staff" method="post"></form>
-    {% csrf_token %}
+<form method="POST">
+{% csrf_token %}
     <table class="table table-striped">
         <tr>
         <thead class="table-light">
@@ -24,8 +39,6 @@
         {% for request in requests %}
             {% comment %} <!-- {% if %} --> {% endcomment %}
         <tr>
-        <form method="POST">
-        {% csrf_token %}
             <td>{{ request.requestid }}</td>
             <td>{{ request.address }}</td>
             <td>{{ request.description }}</td>
@@ -33,7 +46,7 @@
             <!-- <td><input type="text" class="form-control" id="DoA" placeholder="Enter Y/N"></td> -->
             <!-- <td><input type="text" class="form-control" id="Yes/No" placeholder="Enter Y/N"></td> -->
             {% comment %} <td><input type="date" class="form-control" id="DoA" name="DoA" placeholder="Date of Appointment"></td> {% endcomment %}
-            <input type="hidden" name="id" value="{{request.requestid}}"/>
+            <input type="hidden" name="id" id="requestid" value="{{request.requestid}}"/>
             {% comment %} <td><button type="submit" name="updatedoa" class="btn btn-primary">update</td> {% endcomment %}
             {% if request.completed %}
             <td>Completed</td>
@@ -44,16 +57,55 @@
             <td><a class="btn btn-outline-primary" href="/appointments/{{request.requestid}}" role="button">view details</a></td>
             <!-- <td><input type="date" class="form-control" id="DoA" name="DoA" placeholder="Date of Appointment"></td> -->
             {% if not request.completed %}
-            <td><button type="submit" name="complete"class="btn btn-success">Press if completed</td>
-            {%else%}
+            <td><button type="button" id="mod"class="btn btn-success" data-toggle="modal" data-target="#staticBackdrop">Press if completed</button></td>
+            {% else %}
             <td></td>
-            {%endif%}
+            {% endif %}
             {% comment %} <!-- {% endif %} --> {% endcomment %}
-        </form>
         </tr>
         {% endfor %}
     </table>
-   <br>
+
    <!-- <centre> <button type="submit" class="btn btn-primary">Submit</button></> -->
+
+<!-- Button trigger modal -->
+<!-- Button trigger modal -->
+<!--<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#staticBackdrop">
+  Launch static backdrop modal
+</button>-->
+
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                    <div class="modal-header">
+                        <h6 class="modal-title" id="staticBackdropLabel">Enter the otp to complete</h6>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div>
+                        OTP:
+                        <input type="number" name="otp" placeholder="enter otp provided by client"></input>
+                        </div>
+                        <div>
+                        ID:
+                        <input type="number" name="reqid" placeholder="enter the request id to confirm"></input>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" name="complete">Complete</button>
+                    </div>
+                    </div>
+                </div>
+                </div>
 </form>
+<script type="text/javascript">
+        $("#mod").click(function () {
+            var text = $("#requestid").val();
+            $("#modal_body").html(text);
+        });
+    </script>
 {% endblock %}

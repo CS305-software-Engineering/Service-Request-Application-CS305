@@ -170,10 +170,16 @@ def serviceman_request(request):
     
     if request.method=='POST' and 'complete' in request.POST:
         #dateApp = request.POST.get('DoA')
-        id = request.POST.get('id')
-        Request.objects.filter(requestid = id).update(completed = True)
-        context.update({"message":"Request marked as completed"})
-
+        id = request.POST.get('reqid')
+        otp=request.POST.get('otp')
+        request1=Request.objects.filter(requestid = id).first()
+        print(id)
+        if str(otp)==str(request1.otp):
+            Request.objects.filter(requestid = id).update(completed = True)
+            context.update({"message":"Request marked as completed","class":"success"})
+        else:
+            context.update({"message":"Worng OTP","class":"danger"})
+    
     return render(request, 'shop/request_staff.html', context)
 
 def feedback_page(request,requestid):
@@ -309,9 +315,10 @@ def add_request(request):
         address=request.POST.get('address')
         deptnew = request.POST.get('dept')
         print(deptnew)
+        otp=random.randint(1000,9999)
         if(deptnew != "select department" and deptnew!=""): #overriding the prediction by ML model
             department = deptnew
-        given_request = Request(customer_id=current_user.id,department=department,address=address)
+        given_request = Request(customer_id=current_user.id,department=department,address=address,otp=otp)
         given_request.save()
         context = {"message": "Request added successfully", "class": "success","status":201}
     

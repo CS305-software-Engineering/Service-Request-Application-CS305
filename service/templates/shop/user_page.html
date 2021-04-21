@@ -10,10 +10,11 @@
     <table class="table table-striped">
         <thead class="table-dark">
         <tr>
-            <th>Request ID</th>
+            <th>Req ID</th>
             <th>Service-Man ID</th>
             <th>Department</th>
             <th>Status</th>
+            <th>OTP</th>
             <th>Rating</th>
             <th>Feedback</th>
             <th>Add Feedback</th>
@@ -31,6 +32,7 @@
             {%else%}
             <td>In Progress</td>
             {%endif%}
+            <td>{{ request.otp }}</td>
             {%if request.rating == -1%}
             <td> _ </td>
             {%else%}

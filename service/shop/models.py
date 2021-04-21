@@ -36,6 +36,7 @@ class Request(models.Model):
     address = models.CharField(default='_',max_length=500)
     doa = models.DateField(default=datetime.date.today)
     descr = models.CharField(default="_",max_length=500)
+    otp = models.IntegerField(default=1111)
 
 class Appointments(models.Model):
     requestid = models.ForeignKey(Request, on_delete=models.CASCADE)
