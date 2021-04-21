@@ -37,6 +37,8 @@ class Request(models.Model):
     doa = models.DateField(default=datetime.date.today)
     descr = models.CharField(default="_",max_length=500)
     otp = models.IntegerField(default=1111)
+    def __str__(self):
+        return self.requestid
 
 class Appointments(models.Model):
     requestid = models.ForeignKey(Request, on_delete=models.CASCADE)
