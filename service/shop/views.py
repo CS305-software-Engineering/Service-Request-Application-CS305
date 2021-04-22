@@ -139,6 +139,9 @@ def register_sevice(request):
 def user_request(request):
     current_user = request.user
     service_requests = Request.objects.filter(customer_id = current_user.id)
+    # print(service_requests)
+    # for i in service_requests:
+    #     print(i.requestid,i.rating,i.feedback)
     context = {
         'requests' : service_requests
     }
@@ -159,11 +162,53 @@ def serviceman_request(request):
     
     if request.method=='POST' and 'complete' in request.POST:
         #dateApp = request.POST.get('DoA')
-        id = request.POST.get('id')
-        Request.objects.filter(requestid = id).update(completed = True)
-        context.update({"message":"Request marked as completed"})
-
+        id = request.POST.get('reqid')
+        otp=request.POST.get('otp')
+        request1=Request.objects.filter(requestid = id).first()
+        print(id)
+        if str(otp)==str(request1.otp):
+            Request.objects.filter(requestid = id).update(completed = True)
+            context.update({"message":"Request marked as completed","class":"success"})
+        else:
+            context.update({"message":"Worng OTP","class":"danger"})
+    
     return render(request, 'shop/request_staff.html', context)
+
+def serviceman_completed_request(request):
+    current_user = request.user
+    service_requests = Request.objects.filter(serviceman_id = current_user.id)
+    context = {
+        'requests' : service_requests
+    }
+    return render(request, 'shop/request_completed_list.html', context)
+
+def serviceman_inprogress_request(request):
+    current_user = request.user
+    service_requests = Request.objects.filter(serviceman_id = current_user.id)
+    context = {
+        'requests' : service_requests
+    }
+    if request.method=='POST' and 'updatedoa' in request.POST:
+        dateApp = request.POST.get('DoA')
+        id = request.POST.get('id')
+        Request.objects.filter(requestid = id).update(doa = dateApp)
+        context.update({"message":"Next doa added successfully"})
+    
+    if request.method=='POST' and 'complete' in request.POST:
+        #dateApp = request.POST.get('DoA')
+        id = request.POST.get('reqid')
+        otp=request.POST.get('otp')
+        request1=Request.objects.filter(requestid = id).first()
+        print(id)
+        if str(otp)==str(request1.otp):
+            Request.objects.filter(requestid = id).update(completed = True)
+            context.update({"message":"Request marked as completed","class":"success"})
+        else:
+            context.update({"message":"Worng OTP","class":"danger"})
+    
+    return render(request, 'shop/request_inprogress_list.html', context)
+
+
 
 def feedback_page(request,requestid):
     context={}
@@ -219,13 +264,34 @@ def get_tags_from_path(img):
         tags.append(concept['name'])
     return tags
 
-
+## this function to search for a word in a list of words in O(nlogn) complexity ###
+# input: L (a list of words), target (word to be searched)
+# output: None( if value is not found), target(if found)
+def binary_search(L, target):
+    i = 0
+    j = len(L) - 1
+    while i <= j:
+        middle = (i + j)//2
+        midpoint = L[middle]
+        if midpoint > target:
+            j = middle - 1
+        elif midpoint < target:
+            i = middle + 1
+        else:
+            return midpoint
 
 path = 'F:/Pythons/resources/iron1.jpg'
 faucet_url1 = 'https://www.aquantindia.com/wp-content/uploads/2020/04/Faucets-in-Chrome-Finish.jpg'
 # file = Image.open('F:/Pythons/resources/iron1.jpg')
 # file.show()
 
+
+"""
+function to classify image into respective department
+input: string depicting exact path of the file or public url of the image
+output: string containing department i.e. "plumber" or "electrical" 
+        corresponding error message in case of failure
+"""
 def classification(image_path):
     ## Code for image classification
     validate = URLValidator()
@@ -249,11 +315,23 @@ def classification(image_path):
     electrical_set = ['electrical','electronics','power','appliance','computer','conditioner','technology','wire','connection','switch','electricity','lamp','ceiling','fan','heater']  
     score_plumber = 0
     score_electrical =0
-    for tag in tags:
-        if(tag in plumber_set):
+    
+    ##### has n^2 complexity
+    # for tag in tags: 
+    #     if(tag in plumber_set):
+    #         score_plumber+=1
+    #     if(tag in electrical_set):
+    #         score_electrical+=1
+
+    ##### has nlog(n) complexity
+    for word in tags:
+        if binary_search(plumber_set,word) is not None:
             score_plumber+=1
-        if(tag in electrical_set):
+        if binary_search(electrical_set,word) is not None:
             score_electrical+=1
+
+    print("score_plumber =",score_plumber)
+    print("score_electrical =",score_electrical)
     
     if(max(score_electrical,score_plumber)==0):
         return "something went wrong, could not predict the department"
@@ -262,6 +340,7 @@ def classification(image_path):
             return "plumber"
         else:
             return "electrical"
+
 
 def add_request(request):
     context={}
@@ -276,6 +355,18 @@ def add_request(request):
         image = request.POST.get("img")
         category=classification(image)
         context.update({'category': category,'image':image})
+        
+        
+    elif request.method == 'POST' and 'checkfile' in request.POST:
+        image_uploaded = request.FILES['image']
+        fs = FileSystemStorage()
+        filename = fs.save(image_uploaded.name, image_uploaded)
+        uploaded_file_url = fs.url(filename)
+        image = os.path.join(MEDIA_ROOT,filename)
+        print(image)
+        category=classification(image)
+        context.update({'category': category ,'image':image})
+
     
     if request.method == 'POST' and 'submit_request' in request.POST:
         current_user = request.user
@@ -284,11 +375,12 @@ def add_request(request):
         address=request.POST.get('address')
         deptnew = request.POST.get('dept')
         print(deptnew)
+        otp=random.randint(1000,9999)
         if(deptnew != "select department" and deptnew!=""): #overriding the prediction by ML model
             department = deptnew
-        given_request = Request(customer_id=current_user.id,department=department,address=address)
+        given_request = Request(customer_id=current_user.id,department=department,address=address,otp=otp)
         given_request.save()
-        context = {"message": "Successful", "class": "OK","status":201}
+        context = {"message": "Request added successfully", "class": "success","status":201}
     
     return render(request, "shop/add_request.html", context)
 #                                 # accepted = accepted    ,
@@ -330,6 +422,84 @@ def add_request(request):
 #             category=classification(image)
 #             context.update({'category': category})
         
+#this view will be responsible for
+# 1.) GET - Viewing all the appointments of a request with given request id, 
+#           with corresponding fields of remarks and date of appointment
+# 2.) POST- will be used for passing the remarks from the enduser and service staff 
+#           for a particular visit/appointment
+
+def appointments(request,reqid):
+    # context = {}
+    # print("*****************************\nreqid =",reqid)
+    # req_object = Request.objects.filter(requestid=reqid)[0]
+    # all_appointments = Appointments.objects.filter(requestid=req_object)
+
+
+    req_object = Request.objects.filter(requestid=reqid)[0]
+    isCompleted = req_object.completed
+    all_appointments = Appointments.objects.filter(requestid=req_object)
+    context = {'reqid':reqid,"isCompleted":isCompleted,"appointments":all_appointments}
+    if request.method=="GET":
+        # date = request.GET.get('DoA')
+        # id = request.GET.get('id')
+        # id_appointments = Appointments.objects.filter(requestid=id)
+        print("inside GET ReQUEST for appointments")
+        
+        # print("\n\nHERE ****************************> \n",req_object.serviceman_id,req_object.customer_id)
+        all_appointments = Appointments.objects.filter(requestid=req_object)
+        # print(len(all_appointments))
+        context.update({"appointments":all_appointments})
+        return render(request,"shop/appointments.html",context)
+    
+    if request.method=="POST":
+        # date = request.GET.get('DoA')
+        # id = request.GET.get('id')
+        # purpose = request.GET.get('purpose')
+        # remarksfromuser = request.GET.get('remarksFromUser')
+        # remarskfromstaff = request.GET.get('remarksFromStaff')
+
+        if('createNewAppointment' in request.POST):
+            print("-------------------creating new appointment--------------------")
+            purpose = request.POST.get('purpose',"")
+            dateofapp = request.POST.get('DoA')
+            print(dateofapp)
+            print(purpose)
+            newapp = Appointments(requestid = req_object,doa=dateofapp,purpose=purpose)
+            newapp.save()
+        else:
+            date = request.POST.get('DoA')
+            date = parse(date).date()
+            # print(date, type(date))
+            app_object = Appointments.objects.filter(requestid=req_object, doa=date)
+            # print("see here , ", app_object, len(app_object), app_object[0].doa)
+            # id = request.POST.get('id')
+            # purpose = request.POST.get('purpose')
+            remarksfromuser = request.POST.get('remarksFromUser')
+            remarksfromstaff = request.POST.get('remarksFromStaff')
+            print("remarks here \n\n\n\n\n", remarksfromstaff, remarksfromuser)
+            if remarksfromuser != None:
+                # req_object.remark_from_user = remarksfromuser
+                app_object.update(remark_from_user = remarksfromuser)
+            if remarksfromstaff != None:
+                # req_object.remark_from_staff = remarksfromstaff
+                app_object.update(remark_from_staff = remarksfromstaff)
+            print("\n\nnew remarks saved\n\n")
+        #### to be discussed and completed
+        
+        all_appointments = Appointments.objects.filter(requestid=req_object)
+        context.update({"appointments":all_appointments})
+        
+        #### trigger to update next date of appointment field in Request table
+        for app in all_appointments:
+            print("appointment date =",app.doa, "today = ",datetime.date.today())
+            if(app.doa >= datetime.date.today()):
+                nextdoa = app.doa
+                break
+        context.update({"nextdoa":nextdoa})
+        Request.objects.filter(requestid=reqid).update(doa=nextdoa)
+        ##### endtrigger
+        return render(request,"shop/appointments.html",context)
+
 
 def staff_request(request):    
     all_request = Request.objects.all()
@@ -338,10 +508,21 @@ def staff_request(request):
         return render(request,"shop/staff_page.html",context)
     if request.method == 'POST':
         requestid = request.POST.get('id')
+        print("===========================\n",request.POST)
         current_user = request.user
         dateofapp = request.POST.get('DoA')
+        purpose = request.POST.get('purpose',"Initial Inspection")
+        # print("=====================\ndate=",dateofapp,"\nrequestid=",requestid)
+        # Request.objects.filter(requestid=requestid).update(accepted=1,serviceman_id=current_user.id,doa = dateofapp)
+        # newappointment = Appointments(requestid=requestid,doa=dateofapp,purpose=purpose)
+        # newappointment.save()
+        print("=====================\ndate=",dateofapp,"\nrequestid=",requestid)
         Request.objects.filter(requestid=requestid).update(accepted=1,serviceman_id=current_user.id,doa = dateofapp)
-        #print("Its here")
+        req_object = Request.objects.filter(requestid=requestid)[0]
+        
+        newappointment = Appointments(requestid=req_object,doa=dateofapp,purpose=purpose)
+        newappointment.save()
+        # print("Its here")
 #         requestid = request.POST.get('requestid')
 #         accepted = request.POST.get('accepted')
 # #        customer_id = request.POST.get('customer_id')

@@ -17,7 +17,7 @@ myModal.addEventListener('shown.bs.modal', function () {
     {% endif %}
 
     </div>
-<h3>Accepted Requests</h3>
+<h3>In Progress Requests</h3>
 
 
 <form method="POST">
@@ -31,12 +31,13 @@ myModal.addEventListener('shown.bs.modal', function () {
             <!-- <th>Yes/No</th> -->
             <!-- <th>Confirm Y/N</th> -->
             <th>Next Date of Appointment</th>
-            <th>Status</th>
+            <!--<th>Status</th>-->
             <th>View Details</th>
             <th></th>
         </thead>
         </tr>
         {% for request in requests %}
+            {% if not request.completed %}
             {% comment %} <!-- {% if %} --> {% endcomment %}
         <tr>
             <td>{{ request.requestid }}</td>
@@ -48,21 +49,17 @@ myModal.addEventListener('shown.bs.modal', function () {
             {% comment %} <td><input type="date" class="form-control" id="DoA" name="DoA" placeholder="Date of Appointment"></td> {% endcomment %}
             <input type="hidden" name="id" id="requestid" value="{{request.requestid}}"/>
             {% comment %} <td><button type="submit" name="updatedoa" class="btn btn-primary">update</td> {% endcomment %}
-            {% if request.completed %}
-            <td>Completed</td>
-            {% else %}
-            <td>In Progress</td>
-            {% endif %}
+            
             <!-- <td><button type="submit" name="updatedoa" class="btn btn-primary">View Details</td> -->
             <td><a class="btn btn-outline-primary" href="/appointments/{{request.requestid}}" role="button">view details</a></td>
             <!-- <td><input type="date" class="form-control" id="DoA" name="DoA" placeholder="Date of Appointment"></td> -->
-            {% if not request.completed %}
+            
             <td><button type="button" id="mod"class="btn btn-success" data-toggle="modal" data-target="#staticBackdrop">Press if completed</button></td>
-            {% else %}
-            <td></td>
-            {% endif %}
+            
             {% comment %} <!-- {% endif %} --> {% endcomment %}
         </tr>
+            {% else %}
+            {% endif %}
         {% endfor %}
     </table>
 
