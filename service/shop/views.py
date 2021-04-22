@@ -182,6 +182,15 @@ def serviceman_request(request):
     
     return render(request, 'shop/request_staff.html', context)
 
+def serviceman_completed_request(request):
+    current_user = request.user
+    service_requests = Request.objects.filter(serviceman_id = current_user.id)
+    context = {
+        'requests' : service_requests
+    }
+    return render(request, 'shop/request_completed_list.html', context)
+
+
 def feedback_page(request,requestid):
     context={}
     if request.method == 'POST':
