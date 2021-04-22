@@ -190,6 +190,33 @@ def serviceman_completed_request(request):
     }
     return render(request, 'shop/request_completed_list.html', context)
 
+def serviceman_inprogress_request(request):
+    current_user = request.user
+    service_requests = Request.objects.filter(serviceman_id = current_user.id)
+    context = {
+        'requests' : service_requests
+    }
+    if request.method=='POST' and 'updatedoa' in request.POST:
+        dateApp = request.POST.get('DoA')
+        id = request.POST.get('id')
+        Request.objects.filter(requestid = id).update(doa = dateApp)
+        context.update({"message":"Next doa added successfully"})
+    
+    if request.method=='POST' and 'complete' in request.POST:
+        #dateApp = request.POST.get('DoA')
+        id = request.POST.get('reqid')
+        otp=request.POST.get('otp')
+        request1=Request.objects.filter(requestid = id).first()
+        print(id)
+        if str(otp)==str(request1.otp):
+            Request.objects.filter(requestid = id).update(completed = True)
+            context.update({"message":"Request marked as completed","class":"success"})
+        else:
+            context.update({"message":"Worng OTP","class":"danger"})
+    
+    return render(request, 'shop/request_inprogress_list.html', context)
+
+
 
 def feedback_page(request,requestid):
     context={}
