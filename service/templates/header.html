@@ -32,6 +32,20 @@
         <a class="nav-link" href="{% url 'add_request' %}">Add Request</a>
       </li>
       {% endif %}
+      {% if user.is_staff %}
+      <li class="nav-item {% if request.resolver_match.url_name == 'serviceman_completed_request' %}active{% endif %}">
+        <a class="nav-link" href="{% url 'serviceman_completed_request' %}">Completed  Requests</a>
+      </li>
+      {% else %}
+      
+      {% endif %}
+      {% if user.is_staff %}
+      <li class="nav-item {% if request.resolver_match.url_name == 'serviceman_inprogress_request' %}active{% endif %}">
+        <a class="nav-link" href="{% url 'serviceman_inprogress_request' %}">Currently Inprogress  Requests</a>
+      </li>
+      {% else %}
+      
+      {% endif %}
       {% comment %} <li class="nav-item">
         <a class="nav-link" href="#">Pricing</a>
       </li> {% endcomment %}
