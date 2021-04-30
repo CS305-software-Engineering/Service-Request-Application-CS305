@@ -4,8 +4,15 @@
 <br>
 
 
-
     <h3>New requests</h3>
+    <div class="mt-4 col-md-12">
+    {% if message %}
+        <div class="alert alert-{{class}}">
+            {{message}}
+        </div>
+    {% endif %}
+
+    </div>
     <table class="table table-striped">
         <tr>
         <thead class="table-dark">

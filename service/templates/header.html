@@ -33,7 +33,18 @@
       </li>
       {% endif %}
       {% if user.is_staff %}
-      <li class="nav-item {% if request.resolver_match.url_name == 'serviceman_completed_request' %}active{% endif %}">
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Dropdown
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="{% url 'serviceman_completed_request' %}">Completed  Requests</a>
+          <a class="dropdown-item" href="{% url 'serviceman_inprogress_request' %}">Currently Inprogress  Requests</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="#">Something else here</a>
+        </div>
+      </li>
+      {% comment %} <li class="nav-item {% if request.resolver_match.url_name == 'serviceman_completed_request' %}active{% endif %}">
         <a class="nav-link" href="{% url 'serviceman_completed_request' %}">Completed  Requests</a>
       </li>
       {% else %}
@@ -49,6 +60,7 @@
       {% comment %} <li class="nav-item">
         <a class="nav-link" href="#">Pricing</a>
       </li> {% endcomment %}
+      {% endif %}
       {% if user.is_authenticated %}
       <li class="nav-item">
         <a class="nav-link" href="{% url 'logout' %}">Logout</a>

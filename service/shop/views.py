@@ -172,6 +172,9 @@ def serviceman_request(request):
         #dateApp = request.POST.get('DoA')
         id = request.POST.get('reqid')
         otp=request.POST.get('otp')
+        if otp=="" or id=="":
+            context.update({"message":"You did not enter otp or id","class":"danger"})
+            return render(request, 'shop/request_staff.html', context)
         request1=Request.objects.filter(requestid = id).first()
         print(id)
         if str(otp)==str(request1.otp):
@@ -206,6 +209,9 @@ def serviceman_inprogress_request(request):
         #dateApp = request.POST.get('DoA')
         id = request.POST.get('reqid')
         otp=request.POST.get('otp')
+        if otp=="" or id=="":
+            context.update({"message":"You did not enter otp or id","class":"danger"})
+            return render(request, 'shop/request_inprogress_list.html', context)
         request1=Request.objects.filter(requestid = id).first()
         print(id)
         if str(otp)==str(request1.otp):
@@ -356,16 +362,19 @@ def add_request(request):
         all_request = Request.objects.all()
         context = {"requests": all_request}
         return render(request,"shop/add_request.html",context)
-    if request.method == 'POST' and 'checkimage' in request.POST:
-#         requestid = request.POST.get('requestid')
-        # accepted = request.POST.get('accepted')
-        # customer_id = request.POST.get('customer_id')
-        image = request.POST.get("img")
-        category=classification(image)
-        context.update({'category': category,'image':image})
+#     if request.method == 'POST' and 'checkimage' in request.POST:
+# #         requestid = request.POST.get('requestid')
+#         # accepted = request.POST.get('accepted')
+#         # customer_id = request.POST.get('customer_id')
+#         image = request.POST.get("img")
+#         category=classification(image)
+#         context.update({'category': category,'image':image})
         
         
-    elif request.method == 'POST' and 'checkfile' in request.POST:
+    if request.method == 'POST' and 'checkfile' in request.POST:
+        if len(request.FILES) == 0:
+            context = {"message": "No image uploaded", "class": "danger"}
+            return render(request, "shop/add_request.html", context)
         image_uploaded = request.FILES['image']
         fs = FileSystemStorage()
         filename = fs.save(image_uploaded.name, image_uploaded)
@@ -381,6 +390,10 @@ def add_request(request):
         print(current_user.id)
         department=request.POST.get('department')
         address=request.POST.get('address')
+        print(address)
+        if address=="":
+            context = {"message": "Please enter the address", "class": "danger",'category':department}
+            return render(request, "shop/add_request.html", context)
         deptnew = request.POST.get('dept')
         print(deptnew)
         otp=random.randint(1000,9999)
@@ -519,6 +532,9 @@ def staff_request(request):
         print("===========================\n",request.POST)
         current_user = request.user
         dateofapp = request.POST.get('DoA')
+        if dateofapp=="":
+            context.update({"message": "You did not enter date of appointment", "class": "danger"})
+            return render(request, "shop/staff_page.html", context)
         purpose = request.POST.get('purpose',"Initial Inspection")
         # print("=====================\ndate=",dateofapp,"\nrequestid=",requestid)
         # Request.objects.filter(requestid=requestid).update(accepted=1,serviceman_id=current_user.id,doa = dateofapp)
