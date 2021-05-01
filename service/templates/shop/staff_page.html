@@ -13,27 +13,38 @@
     {% endif %}
 
     </div>
-    <table class="table table-striped">
-        <tr>
-        <thead class="table-dark">
-            <th>Request ID</th>
-            <th>Address</th>
-            <th>Department</th>
-            <!-- <th>Yes/No</th> -->
-            <th>Date of Appointment</th>
-            <th style="width:0%"></th>
-            <th>Action</th>
+    <table 
+        id="table"
+        class="table table-striped"
+        data-height="auto"
+        data-toggle="table"
+        data-sort-class="table-active"
+        data-filter-control="true"
+        data-show-search-clear-button="true"
+        data-filter-control-visible="true"
+    >
+        
+        <thead class="thead-dark">
+            <tr>
+                <th data-field="requestid" data-sortable="true">Request ID</th>
+                <th data-field="address" data-filter-control="input">Address</th>
+                <th data-field="department" data-filter-control="select">Department</th>
+                <!-- <th>Yes/No</th> -->
+                <th data-field="doa">Date of Appointment</th>
+                <th data-visible="false"></th>
+                <th>Action</th>
+            </tr>
         </thead>
-        </tr>
+        <tbody>
         {% for request in requests %}
             {% if request.accepted == -1 %}
                 <tr>
                 <form method="post">
                     {% csrf_token %}
-                    <td>{{ request.requestid }}</td>
-                    <td>{{ request.address }}</td>
-                    <td>{{ request.department }}</td>
-                    <td><input type="date" class="form-control" id="DoA" name="DoA" placeholder="Date of Appointment"></td>
+                    <td >{{ request.requestid }}</td>
+                    <td >{{ request.address }}</td>
+                    <td >{{ request.department }}</td>
+                    <td ><input type="date" class="form-control" id="DoA" name="DoA" placeholder="Date of Appointment"></td>
                     <td>
                         <!-- {{request.requestid}} -->
                         <input type="hidden" value="{{request.requestid}}" id="id" name="id"></input>
@@ -45,6 +56,7 @@
                 </tr>
             {% endif %} 
         {% endfor %}
+        </tbody>
     </table>
    <br>
    <!-- <centre>  -->

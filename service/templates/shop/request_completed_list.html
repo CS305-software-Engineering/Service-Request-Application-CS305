@@ -19,23 +19,35 @@ myModal.addEventListener('shown.bs.modal', function () {
     </div>
 <h3>List of Completed Requests</h3>
 
-
+<div class="container-fluid">
 <form method="POST">
 {% csrf_token %}
-    <table class="table table-striped">
+    <table 
+        id="table"
+        class="table table-striped"
+        data-height="auto"
+        data-toggle="table"
+        data-sort-class="table-active"
+        data-filter-control="true"
+        data-show-search-clear-button="true"
+        data-filter-control-visible="true"
+    >
+        
+        <thead class="thead-dark">
         <tr>
-        <thead class="table-light">
-            <th>Request ID</th>
-            <th>Address</th>
-            <th>Description</th>
+            <th data-field="requestid" data-sortable="true">Request ID</th>
+            <th data-field="address" data-filter-control="input">Address</th>
+            <th data-field="description">Description</th>
             <!-- <th>Yes/No</th> -->
             <!-- <th>Confirm Y/N</th> -->
            <!-- <th>Next Date of Appointment</th>
             <th>Status</th>-->
+            <th data-field="rating" data-sortable="true">rating</th>
             <th>View Details</th>
-            <th></th>
-        </thead>
+            
         </tr>
+        </thead>
+        <tbody>
         {% for request in requests %}
 
             {% if  request.completed %}
@@ -44,7 +56,11 @@ myModal.addEventListener('shown.bs.modal', function () {
             <td>{{ request.requestid }}</td>
             <td>{{ request.address }}</td>
             <td>{{ request.description }}</td>
-           
+            {%if request.rating == -1%}
+            <td> _ </td>
+            {%else%}
+            <td>{{ request.rating }}</td>
+            {%endif%}
             <!-- <td><input type="text" class="form-control" id="DoA" placeholder="Enter Y/N"></td> -->
             <!-- <td><input type="text" class="form-control" id="Yes/No" placeholder="Enter Y/N"></td> -->
             {% comment %} <td><input type="date" class="form-control" id="DoA" name="DoA" placeholder="Date of Appointment"></td> {% endcomment %}
@@ -60,6 +76,7 @@ myModal.addEventListener('shown.bs.modal', function () {
             {% else %}
             {% endif %}
         {% endfor %}
+    </tbody>
     </table>
 
    <!-- <centre> <button type="submit" class="btn btn-primary">Submit</button></> -->
@@ -98,6 +115,7 @@ myModal.addEventListener('shown.bs.modal', function () {
                 </div>
                 </div>
 </form>
+</div>
 <script type="text/javascript">
         $("#mod").click(function () {
             var text = $("#requestid").val();

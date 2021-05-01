@@ -4,59 +4,114 @@
 <br>
 <h2>Your Requested Services</h2>
 
-<div class="conatiner">
+<link href="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table.min.css" rel="stylesheet">
+<script src="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table.min.js"></script>
+<script src="https://unpkg.com/bootstrap-table@1.18.3/dist/extensions/filter-control/bootstrap-table-filter-control.min.js"></script>
+<link rel="stylesheet" type="text/css" href="extensions/filter-control/bootstrap-table-filter-control.css">
+<script src="extensions/filter-control/bootstrap-table-filter-control.js"></script>
+
+
+
+<!-- <div class='container-fluid'>
+<table
+  id="table"
+  data-toggle="table"
+  data-height="auto"
+  data-sort-class="table-active"
+  data-filter-control="true"
+  data-show-search-clear-button="true"
+  >
+  <thead>
+    <tr>
+      <th data-field="id" data-sortable="true">ID</th>
+      <th data-field="name" data-sortable="true" data-filter-control="input">Name</th>
+      <th data-field="price" data-sortable="true" data-filter-control="select">address</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+        <td>1</td>
+        <td>samreet singh</td>
+        <td>kanpur</td>
+    </tr>
+    <tr>
+        <td>3</td>
+        <td>navtejpreet Singh</td>
+        <td>mohali</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>atul tiwari</td>
+        <td>kolkata</td>
+    </tr>
+  </tbody>
+</table>
+</div> -->
+
+
+<div class="container-fluid">
 <form method="post">
     {% csrf_token %}
-    <table class="table table-striped">
-        <thead class="table-dark">
-        <tr>
-            <th>Req ID</th>
-            <th>Service-Man ID</th>
-            <th>Department</th>
-            <th>Status</th>
-            <th>OTP</th>
-            <th>Rating</th>
-            <th>Feedback</th>
-            <th>Add Feedback</th>
-            <th>View Appointments</th>
-        </tr>
+    <table 
+        id="table"
+        class="table table-striped"
+        data-height="auto"
+        data-toggle="table"
+        data-sort-class="table-active"
+        data-filter-control="true"
+        data-show-search-clear-button="true"
+        data-filter-control-visible="true"
+        
+    >
+        <thead class="thead-dark">
+            <tr valign="top">
+                <th data-field="requestid" data-sortable="true">Reqest ID</th>
+                <th data-field="serviceman_id" data-sortable="true">Serviceman ID</th>
+                <th data-field="department" data-filter-control="select">Department</th>
+                <th data-field="status" data-filter-control="select">Status</th>
+                <th data-field="otp">OTP</th>
+                <th data-field="rating" data-sortable="true" data-filter-control="select">Rating</th>
+                <th data-field="feedback">Feedback</th>
+                <th data-field="addfeedback">Add Feedback</th>
+                <th data-field="view_appointments" >View Appointments</th>
+            </tr>
         </thead>
-        {% for request in requests %}
-        <tr>
-            
-            <td>{{ request.requestid }}</td>
-            <td>{{ request.serviceman_id }}</td>
-            <td>{{ request.department }}</td>
-            {% if request.completed %}
-            <td>Completed</td>
-            {%else%}
-            <td>In Progress</td>
-            {%endif%}
-            <td>{{ request.otp }}</td>
-            {%if request.rating == -1%}
-            <td> _ </td>
-            {%else%}
-            <td>{{ request.rating }}</td>
-            {%endif%}
-            
-            <td>{{ request.feedback }}</td>
-            <!-- <td>Request not completed yet</td> -->
-            {% if request.completed %}
-            <td><a class="btn btn-outline-primary" href="/feedback_page/{{request.requestid}}" role="button">Add</a></td>
-            {%else%}
-            <td></td>
-            {%endif%}
+        <tbody>
+            {% for request in requests %}
+            <tr>
+                <td>{{ request.requestid }}</td>
+                <td>{{ request.serviceman_id }}</td>
+                <td>{{ request.department }}</td>
+                {% if request.completed %}
+                <td>Completed</td>
+                {%else%}
+                <td>In Progress</td>
+                {%endif%}
+                <td>{{ request.otp }}</td>
+                {%if request.rating == -1%}
+                <td> _ </td>
+                {%else%}
+                <td>{{ request.rating }}</td>
+                {%endif%}
+                
+                <td>{{ request.feedback }}</td>
+                <!-- <td>Request not completed yet</td> -->
+                {% if request.completed %}
+                <td><a class="btn btn-outline-primary" href="/feedback_page/{{request.requestid}}" role="button">Add</a></td>
+                {%else%}
+                <td></td>
+                {%endif%}
 
-            
-            <td><a class="btn btn-outline-secondary" href="/appointments/{{request.requestid}}" role="button">Click here</a></td>
-            <!-- <td><button>hello</button></td> -->
-            <!-- {% if request.completed %} -->
-            <!-- <td><button type="submit" value="{{ request.requestid }}" name="request">Add Feedback</button></td> -->
-            <!-- {% else %} -->
-            
-        </tr>
+                
+                <td><a class="btn btn-outline-secondary" href="/appointments/{{request.requestid}}" role="button">Click here</a></td>
+                <!-- <td><button>hello</button></td> -->
+                <!-- {% if request.completed %} -->
+                <!-- <td><button type="submit" value="{{ request.requestid }}" name="request">Add Feedback</button></td> -->
+                <!-- {% else %} -->  
+            </tr>
             <!-- {% endif %} -->
-        {% endfor %}
+            {% endfor %}
+        </tbody>
     </table>
 </form>
 </div>
