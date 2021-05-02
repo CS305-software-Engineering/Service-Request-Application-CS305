@@ -66,7 +66,7 @@ def login_attempt(request):
                 return redirect('home')
             else:
                 context = {"message" : "Password Incorrect", "class": 'danger'}
-                return render(request, 'accounts/login.html', context)
+                return render(request, 'accounts/login_new.html', context)
 
         elif end_user is not None and service_man is None: # is a end user
             user = authenticate(request, username = phone, password = password)
@@ -77,13 +77,13 @@ def login_attempt(request):
                 return redirect('home')
             else:
                 context = {"message" : "Password Incorrect", "class": 'danger'}
-                return render(request, 'accounts/login.html', context)
+                return render(request, 'accounts/login_new.html', context)
 
         else: # none
             context = {'message': 'User not found, please Register first', 'class': 'danger'}
-            return render(request, 'accounts/login.html', context)
+            return render(request, 'accounts/login_new.html', context)
 
-    return render(request, 'accounts/login.html')
+    return render(request, 'accounts/login_new.html')
 
 def register(request):
     if request.method == "POST":
@@ -91,13 +91,15 @@ def register(request):
         password = request.POST.get('password')
         name = request.POST.get('name')
         phone = request.POST.get('phone')
-
+        if email=="" or password=="" or name=="" or phone=="":
+            context = {"message": "Please fill the form comletely", "class": "danger"}
+            return render(request, "accounts/register_new.html", context)
         check_user = User.objects.filter(email = email).first()
         check_enduser = EndUser.objects.filter(phone = phone).first()
 
         if check_user or check_enduser:
             context = {'message': 'User already exists', 'class': 'danger'}
-            return render(request, 'accounts/register.html', context)
+            return render(request, 'accounts/register_new.html', context)
 
         user = User.objects.create_user(username = phone, email = email, first_name = name, password = password)
         user.save()
@@ -109,7 +111,7 @@ def register(request):
         request.session['type'] = 1
         return redirect(login_attempt)
 
-    return render(request, 'accounts/register.html')
+    return render(request, 'accounts/register_new.html')
 
 def register_sevice(request):
     
