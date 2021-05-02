@@ -1,5 +1,7 @@
 from django.contrib.auth import authenticate, login
 from django.conf import settings
+from django.contrib.auth.decorators import login_required,user_passes_test
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from clarifai.rest import ClarifaiApp
@@ -146,7 +148,7 @@ def register_sevice(request):
 
 
 
-
+@login_required
 def user_request(request):
     current_user = request.user
     service_requests = Request.objects.filter(customer_id = current_user.id)
@@ -174,6 +176,8 @@ def user_request(request):
 
     return render(request, 'shop/user_page.html', context)
 
+
+@user_passes_test(lambda u: u.is_staff)
 def serviceman_request(request):
     current_user = request.user
     service_requests = Request.objects.filter(serviceman_id = current_user.id)
@@ -203,6 +207,7 @@ def serviceman_request(request):
     
     return render(request, 'shop/request_staff.html', context)
 
+@user_passes_test(lambda u: u.is_staff)
 def serviceman_completed_request(request):
     current_user = request.user
     service_requests = Request.objects.filter(serviceman_id = current_user.id)
@@ -211,6 +216,7 @@ def serviceman_completed_request(request):
     }
     return render(request, 'shop/request_completed_list.html', context)
 
+@user_passes_test(lambda u: u.is_staff)
 def serviceman_inprogress_request(request):
     current_user = request.user
     service_requests = Request.objects.filter(serviceman_id = current_user.id)
@@ -236,12 +242,12 @@ def serviceman_inprogress_request(request):
             Request.objects.filter(requestid = id).update(completed = True)
             context.update({"message":"Request marked as completed","class":"success"})
         else:
-            context.update({"message":"Worng OTP","class":"danger"})
+            context.update({"message":"Wrong OTP","class":"danger"})
     
     return render(request, 'shop/request_inprogress_list.html', context)
 
 
-
+@login_required
 def feedback_page(request,requestid):
     context={}
     if request.method == 'POST':
@@ -249,6 +255,9 @@ def feedback_page(request,requestid):
         request.session['request_id'] = requestid
         comment = request.POST.get('feedback')
         rating = request.POST.get('rating')
+        if comment=="" or rating=="":
+            context.update({"message":"Fill all the fields","class":"danger"})
+            return render(request, 'shop/feedback_page.html', context)
         service_request = Request.objects.filter(requestid = requestid)
         print("service_request =>",service_request)
         print(comment)
@@ -257,9 +266,12 @@ def feedback_page(request,requestid):
         context = {
             'service_request' : service_request
         }
+        context.update({"message":"Feedback Added","class":"success"})
 
     return render(request, 'shop/feedback_page.html', context)
 
+
+@login_required
 def thankyou_page(request):
     phone = request.session['phone']
     print(phone)
@@ -374,6 +386,7 @@ def classification(image_path):
             return "electrical"
 
 
+@login_required
 def add_request(request):
     context={}
     if request.method == 'GET':
@@ -467,6 +480,7 @@ def add_request(request):
 # 2.) POST- will be used for passing the remarks from the enduser and service staff 
 #           for a particular visit/appointment
 
+@login_required
 def appointments(request,reqid):
     # context = {}
     # print("*****************************\nreqid =",reqid)
@@ -539,7 +553,7 @@ def appointments(request,reqid):
         ##### endtrigger
         return render(request,"shop/appointments.html",context)
 
-
+@user_passes_test(lambda u: u.is_staff)
 def staff_request(request):    
     all_request = Request.objects.all()
     context = {"requests": all_request}
