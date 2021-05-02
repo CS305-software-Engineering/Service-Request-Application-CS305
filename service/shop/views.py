@@ -154,6 +154,21 @@ def user_request(request):
     context = {
         'requests' : service_requests
     }
+    
+    if request.method == 'POST' and 'delete' in request.POST:
+        
+        id = request.POST.get('id')
+        data_deleted = Request.objects.filter(requestid=id)
+        data_deleted.delete()
+        #print("=====================requestid====",id)
+        service_requests = Request.objects.filter(customer_id = current_user.id)
+    # print(service_requests)
+    # for i in service_requests:
+    #     print(i.requestid,i.rating,i.feedback)
+        context = {
+            'requests' : service_requests
+        }
+        context.update({"message":"Request Deleted Successfully"})
 
     return render(request, 'shop/user_page.html', context)
 
