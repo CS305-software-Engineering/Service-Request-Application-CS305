@@ -74,6 +74,7 @@
                 <th data-field="feedback">Feedback</th>
                 <th data-field="addfeedback">Add Feedback</th>
                 <th data-field="view_appointments" >View Appointments</th>
+                <th>Delete Request</th>
             </tr>
         </thead>
         <tbody>
@@ -104,10 +105,14 @@
 
                 
                 <td><a class="btn btn-outline-secondary" href="/appointments/{{request.requestid}}" role="button">Click here</a></td>
+              
+                <input type="hidden" name="id" id="requestid" value="{{request.requestid}}"/>
+                <td><button type="submit" name="delete" class="btn btn-primary">Delete Request</td>
                 <!-- <td><button>hello</button></td> -->
                 <!-- {% if request.completed %} -->
                 <!-- <td><button type="submit" value="{{ request.requestid }}" name="request">Add Feedback</button></td> -->
                 <!-- {% else %} -->  
+              
             </tr>
             <!-- {% endif %} -->
             {% endfor %}
