@@ -17,7 +17,7 @@ urlpatterns = [
     path('serviceman_request',serviceman_request,name='serviceman_request'),
     path('serviceman_completed_request',serviceman_completed_request,name='serviceman_completed_request'),
     path('serviceman_inprogress_request',serviceman_inprogress_request,name='serviceman_inprogress_request'),
-    path('appointments/<str:reqid>',appointments,name="appointments")
+    path('appointments/<int:reqid>',appointments,name="appointments")
 ]
 
 if settings.DEBUG:

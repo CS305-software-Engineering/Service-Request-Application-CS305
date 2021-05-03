@@ -56,6 +56,7 @@ def login_attempt(request):
         service_man = serviceman.objects.filter(phone = phone).first()
         print(service_man)
 
+        print("idharrrrrrrrrrrrrrrrrrrrrr")
         if end_user is None and service_man is not None: # is a service_man
             user = authenticate(request, username=phone, password=password)
             print(user)
@@ -86,16 +87,18 @@ def login_attempt(request):
     return render(request, 'accounts/login.html')
 
 def register(request):
+    context = {'defaultmsg':'inside_register'}
     if request.method == "POST":
         email = request.POST.get('email')
         password = request.POST.get('password')
         name = request.POST.get('name')
         phone = request.POST.get('phone')
-
+        print("HELLO :::::::::: ")
         check_user = User.objects.filter(email = email).first()
         check_enduser = EndUser.objects.filter(phone = phone).first()
 
         if check_user or check_enduser:
+            print("DANGER:::::::::: USER ALREADY EXISTS")
             context = {'message': 'User already exists', 'class': 'danger'}
             return render(request, 'accounts/register.html', context)
 
@@ -107,6 +110,7 @@ def register(request):
 
         request.session['phone'] = phone
         request.session['type'] = 1
+        context.update({'class':'success'})
         return redirect(login_attempt)
 
     return render(request, 'accounts/register.html')
