@@ -515,6 +515,24 @@ def appointments(request,reqid):
             print("-------------------creating new appointment--------------------")
             purpose = request.POST.get('purpose',"")
             dateofapp = request.POST.get('DoA')
+            
+            if dateofapp=="" and purpose=="":
+                context.update({"message": "You did not enter date of appointment and purpose of appointment", "class": "danger"})
+                return render(request,"shop/appointments.html",context)
+
+            if dateofapp=="":
+                context.update({"message": "You did not enter date of appointment", "class": "danger"})
+                return render(request,"shop/appointments.html",context)
+
+            if purpose=="":
+                context.update({"message": "You did not enter purpose of appointment", "class": "danger"})
+                return render(request,"shop/appointments.html",context)
+
+            
+            date_app = datetime.datetime.strptime(dateofapp, "%Y-%m-%d").date()
+            if date_app < datetime.date.today():
+                context.update({"message": "The date has already passed", "class": "danger"})
+                return render(request,"shop/appointments.html",context)
             print(dateofapp)
             print(purpose)
             newapp = Appointments(requestid = req_object,doa=dateofapp,purpose=purpose)
