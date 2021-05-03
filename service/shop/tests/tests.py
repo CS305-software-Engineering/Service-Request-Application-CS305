@@ -48,33 +48,66 @@ import time
 
 # class LoginTest(LiveServerTestCase):
 
-#   def test(self):
-#     # selenium = webdriver.Chrome()
-#     selenium = webdriver.Firefox()
-#     #Choose your url to visit
-#     selenium.get('http://127.0.0.1:8000/login')
-#     #find the elements you need to submit form
-#     phone = selenium.find_element_by_name('phone')
-#     password = selenium.find_element_by_name('password')
-#     # player_name = selenium.find_element_by_id('id_name')
-#     # player_height = selenium.find_element_by_id('id_height')
-#     # player_team = selenium.find_element_by_id('id_team')
-#     # player_ppg = selenium.find_element_by_id('id_ppg')
+def test(self):
+    # selenium = webdriver.Chrome()
+    selenium = webdriver.Firefox()
+    #Choose your url to visit
+    selenium.get('http://127.0.0.1:8000/login')
+    #find the elements you need to submit form
+    phone = selenium.find_element_by_name('phone')
+    password = selenium.find_element_by_name('password')
+    # player_name = selenium.find_element_by_id('id_name')
+    # player_height = selenium.find_element_by_id('id_height')
+    # player_team = selenium.find_element_by_id('id_team')
+    # player_ppg = selenium.find_element_by_id('id_ppg')
 
-#     submit = selenium.find_element_by_name('loginsubmit')
+    submit = selenium.find_element_by_name('loginsubmit')
 
-#     #populate the form with data
-#     phone.send_keys('7777777777')
-#     password.send_keys('Service@123')
-#     # player_name.send_keys('Lebron James')
-#     # player_team.send_keys('Los Angeles Lakers')
-#     # player_height.send_keys('6 feet 9 inches')
-#     # player_ppg.send_keys('25.7')
-#     print("before",selenium.current_url)
-#     #submit form
-#     submit.send_keys(Keys.RETURN)
-#     time.sleep(2)
-#     print("after",selenium.current_url)
-#     #check result; page source looks at entire html document
-#     assert '7777777777' in selenium.page_source
-#     selenium.close()
+    #populate the form with data
+    phone.send_keys('7777777777')
+    password.send_keys('Service@123')
+    # player_name.send_keys('Lebron James')
+    # player_team.send_keys('Los Angeles Lakers')
+    # player_height.send_keys('6 feet 9 inches')
+    # player_ppg.send_keys('25.7')
+    print("before",selenium.current_url)
+    #submit form
+    submit.send_keys(Keys.RETURN)
+    time.sleep(2)
+    print("after",selenium.current_url)
+    #check result; page source looks at entire html document
+    assert '7777777777' in selenium.page_source
+    selenium.close()
+
+
+class LogoutTest(LiveServerTestCase):
+    def test(self):
+        phone = '7777777777'
+        pwd = 'Service@123'
+        ###################################
+        # def login(phone,password):
+        selenium = webdriver.Chrome()
+        selenium.get('http://127.0.0.1:8000/login')
+        #find the elements you need to submit form
+        phone = selenium.find_element_by_name('phone')
+        password = selenium.find_element_by_name('password')
+
+        submit = selenium.find_element_by_name('loginsubmit')
+
+        #populate the form with data
+        phone.send_keys('7777777777')
+        password.send_keys(pwd)
+
+        #submit form
+        submit.send_keys(Keys.RETURN)
+        #################################      
+        
+        # login(phone,pwd)
+
+        selenium.get('http://127.0.0.1:8000/staff_page')
+
+        logout = selenium.find_element_by_name('logoutnav') 
+
+        logout.send_keys(Keys.RETURN)
+        assert selenium.current_url == 'http://127.0.0.1:8000/login'
+        selenium.close()
