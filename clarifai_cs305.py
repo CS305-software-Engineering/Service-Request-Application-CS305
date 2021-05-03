@@ -1,29 +1,69 @@
-from clarifai.rest import ClarifaiApp
+# from clarifai.rest import ClarifaiApp
 from PIL import Image
-from django.core.validators import URLValidator
-from django.core.exceptions import ValidationError
+# from django.core.validators import URLValidator
+# from django.core.exceptions import ValidationError
 from dotenv import load_dotenv
 import os
-# import validators
-load_dotenv()
-app = ClarifaiApp(api_key = os.environ.get('CLARIFAI_API_KEY'))
+
+from clarifai_grpc.channel.clarifai_channel import ClarifaiChannel
+from clarifai_grpc.grpc.api import service_pb2_grpc
+stub = service_pb2_grpc.V2Stub(ClarifaiChannel.get_grpc_channel())
+
+from clarifai_grpc.grpc.api import service_pb2, resources_pb2
+from clarifai_grpc.grpc.api.status import status_code_pb2
+
+# This is how you authenticate.
+metadata = (('authorization', 'Key 02aad03316c148aab10375c462ae4f68'),)
+
+
+
 
 ######## This function takes a public url of the image and sends the predictions ################
 def get_tags_from_url(image_url):
-    response_data = app.tag_urls([image_url])
     tags = []
-    for concept in response_data['outputs'][0]['data']['concepts']:
-        tags.append(concept['name'])
+    request = service_pb2.PostModelOutputsRequest(
+    model_id='aaa03c23b3724a16a56b629203edc62c',
+    inputs=[
+      resources_pb2.Input(data=resources_pb2.Data(image=resources_pb2.Image(url=image_url)))
+    ])
+    response = stub.PostModelOutputs(request, metadata=metadata)
+
+    if response.status.code != status_code_pb2.SUCCESS:
+        raise Exception("Request failed, status code: " + str(response.status.code))
+
+    for concept in response.outputs[0].data.concepts:
+        tags.append(concept.name)
     return tags
 
-#### this can take a path of a local image file as input, uses OS library and sends predictions ##########################
-def get_tags_from_path(img):
-    # print(type(img))
-    response_data = app.tag_files([img])
+def get_tags_from_path(image_path):
+    print("image path => ",image_path)
+    with open(image_path,"rb") as f:
+        file_bytes = f.read()
     tags = []
-    for concept in response_data['outputs'][0]['data']['concepts']:
-        tags.append(concept['name'])
+    request = service_pb2.PostModelOutputsRequest(
+    model_id='aaa03c23b3724a16a56b629203edc62c',
+    inputs=[
+      resources_pb2.Input(data=resources_pb2.Data(image=resources_pb2.Image(base64=file_bytes)))
+    ])
+    response = stub.PostModelOutputs(request, metadata=metadata)
+
+    if response.status.code != status_code_pb2.SUCCESS:
+        raise Exception("Request failed, status code: " + str(response.status.code))
+
+    for concept in response.outputs[0].data.concepts:
+        tags.append(concept.name)
     return tags
+
+
+img_url = 'https://www.havells.com/content/dam/havells/consumer/appliances-new/garment-care/dry-iron/adore-peach/cover.png'
+# print(get_tags_from_url(img_url))
+img_path = "F:/tryingStuff/Service-Request-Application-CS305/service/media/heater1.jpg"
+# print(help(resources_pb2.Image))
+print(get_tags_from_path(img_path))
+
+
+"""app = ClarifaiApp(api_key = keykey)
+
 
 ## this function to search for a word in a list of words in O(nlogn) complexity ###
 # input: L (a list of words), target (word to be searched)
@@ -97,4 +137,4 @@ def classification(image_path):
 
 
 dept = classification(faucet_url1)
-print(dept)
+print(dept)"""

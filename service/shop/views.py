@@ -4,7 +4,6 @@ from django.contrib.auth.decorators import login_required,user_passes_test
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
-from clarifai.rest import ClarifaiApp
 from PIL import Image
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
@@ -12,20 +11,26 @@ from django.core.files.storage import FileSystemStorage
 from dotenv import load_dotenv
 import os
 import datetime
-from service.settings import MEDIA_ROOT
-from dateutil.parser import parse
-load_dotenv()
-
 from .models import EndUser,serviceman,Request,Appointments
-
 import random
-import http.client
 from django.http import HttpResponse
 
+from service.settings import MEDIA_ROOT
+from dateutil.parser import parse
+
+from clarifai_grpc.channel.clarifai_channel import ClarifaiChannel
+from clarifai_grpc.grpc.api import service_pb2_grpc
+stub = service_pb2_grpc.V2Stub(ClarifaiChannel.get_grpc_channel())
+
+from clarifai_grpc.grpc.api import service_pb2, resources_pb2
+from clarifai_grpc.grpc.api.status import status_code_pb2
+
+# This is how you authenticate.
+load_dotenv()
+keykey = os.environ.get('CLARIFAI_API_KEY')
+# print(keykey)
 try:
-    keykey = os.environ.get('CLARIFAI_API_KEY')
-    print(keykey)
-    app = ClarifaiApp(api_key=keykey)
+    metadata = (('authorization', 'Key '+keykey),)
 except:
     print("Please provide a valid API KEY for Image classification Clarifai API")
     #exit()
@@ -163,10 +168,11 @@ def user_request(request):
     context = {
         'requests' : service_requests
     }
-    
+    print("***************************",request.POST)
     if request.method == 'POST' and 'delete' in request.POST:
         
-        id = request.POST.get('id')
+        id = request.POST.get('reqid')
+        print("deleting request with request id =",id)
         data_deleted = Request.objects.filter(requestid=id)
         data_deleted.delete()
         #print("=====================requestid====",id)
@@ -177,7 +183,7 @@ def user_request(request):
         context = {
             'requests' : service_requests
         }
-        context.update({"message":"Request Deleted Successfully"})
+        context.update({"message":"Request Deleted Successfully","class":"success"})
 
     return render(request, 'shop/user_page.html', context)
 
@@ -193,7 +199,7 @@ def serviceman_request(request):
         dateApp = request.POST.get('DoA')
         id = request.POST.get('id')
         Request.objects.filter(requestid = id).update(doa = dateApp)
-        context.update({"message":"Next doa added successfully"})
+        context.update({"message":"Next doa added successfully","class":"success"})
     
     if request.method=='POST' and 'complete' in request.POST:
         #dateApp = request.POST.get('DoA')
@@ -208,7 +214,7 @@ def serviceman_request(request):
             Request.objects.filter(requestid = id).update(completed = True)
             context.update({"message":"Request marked as completed","class":"success"})
         else:
-            context.update({"message":"Worng OTP","class":"danger"})
+            context.update({"message":"Wrong OTP, Please check the OTP again","class":"danger"})
     
     return render(request, 'shop/request_staff.html', context)
 
@@ -232,7 +238,7 @@ def serviceman_inprogress_request(request):
         dateApp = request.POST.get('DoA')
         id = request.POST.get('id')
         Request.objects.filter(requestid = id).update(doa = dateApp)
-        context.update({"message":"Next doa added successfully"})
+        context.update({"message":"Next doa added successfully","class":"success"})
     
     if request.method=='POST' and 'complete' in request.POST:
         #dateApp = request.POST.get('DoA')
@@ -254,6 +260,7 @@ def serviceman_inprogress_request(request):
 
 @login_required
 def feedback_page(request,requestid):
+    
     context={}
     if request.method == 'POST':
         # request_id = request.POST['request']
@@ -298,20 +305,41 @@ def thankyou_page(request):
 
 ######## This function takes a public url of the image and sends the predictions ################
 def get_tags_from_url(image_url):
-    response_data = app.tag_urls([image_url])
     tags = []
-    for concept in response_data['outputs'][0]['data']['concepts']:
-        tags.append(concept['name'])
+    request = service_pb2.PostModelOutputsRequest(
+    model_id='aaa03c23b3724a16a56b629203edc62c',
+    inputs=[
+      resources_pb2.Input(data=resources_pb2.Data(image=resources_pb2.Image(url=image_url)))
+    ])
+    response = stub.PostModelOutputs(request, metadata=metadata)
+
+    if response.status.code != status_code_pb2.SUCCESS:
+        raise Exception("Request failed, status code: " + str(response.status.code))
+
+    for concept in response.outputs[0].data.concepts:
+        tags.append(concept.name)
     return tags
 
 #### this can take a path of a local image file as input, uses OS library and sends predictions ##########################
-def get_tags_from_path(img):
-    # print(type(img))
-    response_data = app.tag_files([img])
+def get_tags_from_path(image_path):
+    print("image path => ",image_path)
+    with open(image_path,"rb") as f:
+        file_bytes = f.read()
     tags = []
-    for concept in response_data['outputs'][0]['data']['concepts']:
-        tags.append(concept['name'])
+    request = service_pb2.PostModelOutputsRequest(
+    model_id='aaa03c23b3724a16a56b629203edc62c',
+    inputs=[
+      resources_pb2.Input(data=resources_pb2.Data(image=resources_pb2.Image(base64=file_bytes)))
+    ])
+    response = stub.PostModelOutputs(request, metadata=metadata)
+
+    if response.status.code != status_code_pb2.SUCCESS:
+        raise Exception("Request failed, status code: " + str(response.status.code))
+
+    for concept in response.outputs[0].data.concepts:
+        tags.append(concept.name)
     return tags
+
 
 ## this function to search for a word in a list of words in O(nlogn) complexity ###
 # input: L (a list of words), target (word to be searched)
@@ -328,6 +356,8 @@ def binary_search(L, target):
             i = middle + 1
         else:
             return midpoint
+
+
 
 path = 'F:/Pythons/resources/iron1.jpg'
 faucet_url1 = 'https://www.aquantindia.com/wp-content/uploads/2020/04/Faucets-in-Chrome-Finish.jpg'
@@ -349,22 +379,36 @@ def classification(image_path):
         print("is a URL =>", image_path)
         try:
             tags = get_tags_from_url(image_path)
-        
         except:
             return "invalid URL of the image file, kindly enter exact path of the image file or image url"
     except ValidationError as e:
         print("is not a url =>",image_path)
         try:
             tags = get_tags_from_path(image_path)
-            
         except:
             return "invalid PATH of the image file, kindly enter exact path of the image file or image url"
 
-    plumber_set = ['faucet','pipes','pipe','shower','wash','basin','water','washcloset','bathroom','water closet','flush','bathtub','steel','plumber','plumbing','wet']
-    electrical_set = ['electrical','electronics','power','appliance','computer','conditioner','technology','wire','connection','switch','electricity','lamp','ceiling','fan','heater']  
+    print("****************** tags ***********************\n",tags)
+    plumber_set = ['faucet','pipes','pipe','shower','wash','tank','basin','water','H2O','washcloset','bathroom','water closet','flush','bathtub','steel','plumber','plumbing','wet']
+    electrical_set = ['electrical','electronics','heat','power','appliance','computer','conditioner','technology','wire','connection','switch','electricity','lamp','ceiling','fan','heater']  
     score_plumber = 0
     score_electrical =0
     
+    plumber_set.sort()
+    electrical_set.sort()
+    tags.sort()
+    i,j,k=0,0,0
+    for i in range(len(tags)):
+        while(electrical_set[j]<tags[i] and j<len(electrical_set)):
+            j+=1
+        while(plumber_set[k]<tags[i] and k<len(plumber_set)):
+            k+=1
+        
+        if electrical_set[j]==tags[i]:
+            score_electrical+=1
+        if plumber_set[k]==tags[i]:
+            score_plumber+=1
+
     ##### has n^2 complexity
     # for tag in tags: 
     #     if(tag in plumber_set):
@@ -373,11 +417,11 @@ def classification(image_path):
     #         score_electrical+=1
 
     ##### has nlog(n) complexity
-    for word in tags:
-        if binary_search(plumber_set,word) is not None:
-            score_plumber+=1
-        if binary_search(electrical_set,word) is not None:
-            score_electrical+=1
+    # for word in tags:
+    #     if binary_search(plumber_set,word) is not None:
+    #         score_plumber+=1
+    #     if binary_search(electrical_set,word) is not None:
+    #         score_electrical+=1
 
     print("score_plumber =",score_plumber)
     print("score_electrical =",score_electrical)
@@ -574,6 +618,7 @@ def appointments(request,reqid):
         context.update({"nextdoa":nextdoa})
         Request.objects.filter(requestid=reqid).update(doa=nextdoa)
         ##### endtrigger
+        context.update({'message':'new appointment created!','class':'success'})
         return render(request,"shop/appointments.html",context)
 
 @user_passes_test(lambda u: u.is_staff)
@@ -583,7 +628,7 @@ def staff_request(request):
     if request.method == 'GET':        
         return render(request,"shop/staff_page.html",context)
     if request.method == 'POST':
-        requestid = request.POST.get('id')
+        requestid = request.POST.get('reqid')
         print("===========================\n",request.POST)
         current_user = request.user
         dateofapp = request.POST.get('DoA')
@@ -625,8 +670,7 @@ def staff_request(request):
                                
 #                                 )
 #         given_request.save()
-        context.update({"message": "Successful", "class": "OK","status":201})
-        # context = {"message": "No request found", "class": "danger","status":404}
+        context.update({"message": "request accepted successful","class":"success","status":201})
         return render(request, "shop/staff_page.html", context)
 
 def home(request):
