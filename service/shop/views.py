@@ -567,6 +567,11 @@ def staff_request(request):
         if dateofapp=="":
             context.update({"message": "You did not enter date of appointment", "class": "danger"})
             return render(request, "shop/staff_page.html", context)
+        
+        date_app = datetime.datetime.strptime(dateofapp, "%Y-%m-%d").date()
+        if date_app < datetime.date.today():
+            context.update({"message": "The date has already passed", "class": "danger"})
+            return render(request, "shop/staff_page.html", context)
         purpose = request.POST.get('purpose',"Initial Inspection")
         # print("=====================\ndate=",dateofapp,"\nrequestid=",requestid)
         # Request.objects.filter(requestid=requestid).update(accepted=1,serviceman_id=current_user.id,doa = dateofapp)
