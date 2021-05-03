@@ -17,14 +17,14 @@ class TestViews(TestCase):
         self.appointments_url = reverse('appointments',args=[1])
         self.register_url = reverse('register')
         self.add_request_url = reverse('add_request')
-        self.login_url = reverse('login')
+        self.login_url = reverse('login_attempt')
         self.feedback_url = reverse("feedback_page",args=[1])
     
     def test_register_GET(self):
         print("Testing_views................ register - GET",end="")
         response = self.client.get(self.register_url)
         self.assertEquals(response.status_code,200)
-        self.assertTemplateUsed(response, 'accounts/register.html')
+        self.assertTemplateUsed(response, 'accounts/register_new.html')
 
     def test_register_POST(self):
         print("Testing_views................ register new user - POST",end="")
@@ -57,13 +57,18 @@ class TestViews(TestCase):
         self.assertEquals(response.context.get('class'),'danger')
         # print(len(EndUser.objects.filter(phone="9876543210")),len(EndUser.objects.filter(phone="9876543212")),len(EndUser.objects.all()))
         
-
-    # def test_login_POST(self):
-    #     print("Testing_views................ login - POST",end="")
-    #     response = self.client.post(self.login_url,{
-    #         "phone":"9876543210",
-    #         "password":"password"
-    #     })
+    def test_login_GET(self):
+        print("Testing_views................ register - GET",end="")
+        response = self.client.get(self.login_url)
+        self.assertEquals(response.status_code,200)
+        self.assertTemplateUsed(response, 'accounts/login_new.html')
+    
+    def test_login_POST(self):
+        print("Testing_views................ login - POST",end="")
+        response = self.client.post(self.login_url,{
+            "phone":"9876543210",
+            "password":"password"
+        })
 
 
     # def test_add_request_post(self):
