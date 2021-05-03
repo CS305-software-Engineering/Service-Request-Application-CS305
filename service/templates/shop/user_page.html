@@ -47,8 +47,9 @@
   </tbody>
 </table>
 </div> -->
-
-
+{% if user.is_staff %}
+<h2>You are not allowed here</h2>
+{% else %}
 <div class="container-fluid">
 <form method="post">
     {% csrf_token %}
@@ -120,4 +121,5 @@
     </table>
 </form>
 </div>
+{% endif %}
 {% endblock %}

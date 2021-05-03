@@ -1,5 +1,7 @@
 from django.contrib.auth import authenticate, login
 from django.conf import settings
+from django.contrib.auth.decorators import login_required,user_passes_test
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from clarifai.rest import ClarifaiApp
@@ -67,7 +69,7 @@ def login_attempt(request):
                 return redirect('home')
             else:
                 context = {"message" : "Password Incorrect", "class": 'danger'}
-                return render(request, 'accounts/login.html', context)
+                return render(request, 'accounts/login_new.html', context)
 
         elif end_user is not None and service_man is None: # is a end user
             user = authenticate(request, username = phone, password = password)
@@ -78,13 +80,13 @@ def login_attempt(request):
                 return redirect('home')
             else:
                 context = {"message" : "Password Incorrect", "class": 'danger'}
-                return render(request, 'accounts/login.html', context)
+                return render(request, 'accounts/login_new.html', context)
 
         else: # none
             context = {'message': 'User not found, please Register first', 'class': 'danger'}
-            return render(request, 'accounts/login.html', context)
+            return render(request, 'accounts/login_new.html', context)
 
-    return render(request, 'accounts/login.html')
+    return render(request, 'accounts/login_new.html')
 
 def register(request):
     context = {'defaultmsg':'inside_register'}
@@ -94,13 +96,16 @@ def register(request):
         name = request.POST.get('name')
         phone = request.POST.get('phone')
         print("HELLO :::::::::: ")
+        if email=="" or password=="" or name=="" or phone=="":
+            context = {"message": "Please fill the form comletely", "class": "danger"}
+            return render(request, "accounts/register_new.html", context)
         check_user = User.objects.filter(email = email).first()
         check_enduser = EndUser.objects.filter(phone = phone).first()
 
         if check_user or check_enduser:
             print("DANGER:::::::::: USER ALREADY EXISTS")
             context = {'message': 'User already exists', 'class': 'danger'}
-            return render(request, 'accounts/register.html', context)
+            return render(request, 'accounts/register_new.html', context)
 
         user = User.objects.create_user(username = phone, email = email, first_name = name, password = password)
         user.save()
@@ -113,7 +118,7 @@ def register(request):
         context.update({'class':'success'})
         return redirect(login_attempt)
 
-    return render(request, 'accounts/register.html')
+    return render(request, 'accounts/register_new.html')
 
 def register_sevice(request):
     
@@ -148,7 +153,7 @@ def register_sevice(request):
 
 
 
-
+@login_required
 def user_request(request):
     current_user = request.user
     service_requests = Request.objects.filter(customer_id = current_user.id)
@@ -176,6 +181,8 @@ def user_request(request):
 
     return render(request, 'shop/user_page.html', context)
 
+
+@user_passes_test(lambda u: u.is_staff)
 def serviceman_request(request):
     current_user = request.user
     service_requests = Request.objects.filter(serviceman_id = current_user.id)
@@ -205,6 +212,7 @@ def serviceman_request(request):
     
     return render(request, 'shop/request_staff.html', context)
 
+@user_passes_test(lambda u: u.is_staff)
 def serviceman_completed_request(request):
     current_user = request.user
     service_requests = Request.objects.filter(serviceman_id = current_user.id)
@@ -213,6 +221,7 @@ def serviceman_completed_request(request):
     }
     return render(request, 'shop/request_completed_list.html', context)
 
+@user_passes_test(lambda u: u.is_staff)
 def serviceman_inprogress_request(request):
     current_user = request.user
     service_requests = Request.objects.filter(serviceman_id = current_user.id)
@@ -238,12 +247,12 @@ def serviceman_inprogress_request(request):
             Request.objects.filter(requestid = id).update(completed = True)
             context.update({"message":"Request marked as completed","class":"success"})
         else:
-            context.update({"message":"Worng OTP","class":"danger"})
+            context.update({"message":"Wrong OTP","class":"danger"})
     
     return render(request, 'shop/request_inprogress_list.html', context)
 
 
-
+@login_required
 def feedback_page(request,requestid):
     context={}
     if request.method == 'POST':
@@ -251,6 +260,9 @@ def feedback_page(request,requestid):
         request.session['request_id'] = requestid
         comment = request.POST.get('feedback')
         rating = request.POST.get('rating')
+        if comment=="" or rating=="":
+            context.update({"message":"Fill all the fields","class":"danger"})
+            return render(request, 'shop/feedback_page.html', context)
         service_request = Request.objects.filter(requestid = requestid)
         print("service_request =>",service_request)
         print(comment)
@@ -259,9 +271,12 @@ def feedback_page(request,requestid):
         context = {
             'service_request' : service_request
         }
+        context.update({"message":"Feedback Added","class":"success"})
 
     return render(request, 'shop/feedback_page.html', context)
 
+
+@login_required
 def thankyou_page(request):
     phone = request.session['phone']
     print(phone)
@@ -376,6 +391,7 @@ def classification(image_path):
             return "electrical"
 
 
+@login_required
 def add_request(request):
     context={}
     if request.method == 'GET':
@@ -469,6 +485,7 @@ def add_request(request):
 # 2.) POST- will be used for passing the remarks from the enduser and service staff 
 #           for a particular visit/appointment
 
+@login_required
 def appointments(request,reqid):
     # context = {}
     # print("*****************************\nreqid =",reqid)
@@ -503,6 +520,24 @@ def appointments(request,reqid):
             print("-------------------creating new appointment--------------------")
             purpose = request.POST.get('purpose',"")
             dateofapp = request.POST.get('DoA')
+            
+            if dateofapp=="" and purpose=="":
+                context.update({"message": "You did not enter date of appointment and purpose of appointment", "class": "danger"})
+                return render(request,"shop/appointments.html",context)
+
+            if dateofapp=="":
+                context.update({"message": "You did not enter date of appointment", "class": "danger"})
+                return render(request,"shop/appointments.html",context)
+
+            if purpose=="":
+                context.update({"message": "You did not enter purpose of appointment", "class": "danger"})
+                return render(request,"shop/appointments.html",context)
+
+            
+            date_app = datetime.datetime.strptime(dateofapp, "%Y-%m-%d").date()
+            if date_app < datetime.date.today():
+                context.update({"message": "The date has already passed", "class": "danger"})
+                return render(request,"shop/appointments.html",context)
             print(dateofapp)
             print(purpose)
             newapp = Appointments(requestid = req_object,doa=dateofapp,purpose=purpose)
@@ -541,7 +576,7 @@ def appointments(request,reqid):
         ##### endtrigger
         return render(request,"shop/appointments.html",context)
 
-
+@user_passes_test(lambda u: u.is_staff)
 def staff_request(request):    
     all_request = Request.objects.all()
     context = {"requests": all_request}
@@ -554,6 +589,11 @@ def staff_request(request):
         dateofapp = request.POST.get('DoA')
         if dateofapp=="":
             context.update({"message": "You did not enter date of appointment", "class": "danger"})
+            return render(request, "shop/staff_page.html", context)
+        
+        date_app = datetime.datetime.strptime(dateofapp, "%Y-%m-%d").date()
+        if date_app < datetime.date.today():
+            context.update({"message": "The date has already passed", "class": "danger"})
             return render(request, "shop/staff_page.html", context)
         purpose = request.POST.get('purpose',"Initial Inspection")
         # print("=====================\ndate=",dateofapp,"\nrequestid=",requestid)

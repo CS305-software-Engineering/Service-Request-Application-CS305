@@ -7,7 +7,11 @@
 </div>
 <hr>
 <br>
-
+{% if message %}
+            <div class="alert alert-{{class}}">
+                {{message}}
+            </div>
+            {% endif %}
 <div style="width: 40%; padding: 1%">
     <form method="POST" id="feedbackform">
         {% csrf_token %}

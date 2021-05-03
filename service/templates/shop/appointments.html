@@ -16,6 +16,14 @@
 <body>
     
     <br>
+    <div class="mt-4 col-md-12">
+        {% if message %}
+            <div class="alert alert-{{class}}">
+                {{message}}
+            </div>
+        {% endif %}
+    
+        </div>
     <div style="padding:2%">
     <table class="table">
     <tr>
