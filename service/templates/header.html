@@ -63,7 +63,7 @@
       {% endif %}
       {% if user.is_authenticated %}
       <li class="nav-item">
-        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+        <a name="logoutnav" class="nav-link" href="{% url 'logout' %}">Logout</a>
       </li>
       {% endif %}
     </ul>

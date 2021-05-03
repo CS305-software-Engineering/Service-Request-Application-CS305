@@ -1,5 +1,5 @@
 from django.test import TestCase
-from .models import *
+from shop.models import *
 from django.utils import timezone
 from django.test import LiveServerTestCase
 from selenium import webdriver
@@ -75,3 +75,36 @@ class LoginTest(LiveServerTestCase):
 
     #check result; page source looks at entire html document
     assert '7777777777' in selenium.page_source
+
+
+class LogoutTest(LiveServerTestCase):
+    def test(self):
+        phone = '7777777777'
+        pwd = 'Service@123'
+        ###################################
+        # def login(phone,password):
+        selenium = webdriver.Chrome()
+        selenium.get('http://127.0.0.1:8000/login')
+        #find the elements you need to submit form
+        phone = selenium.find_element_by_name('phone')
+        password = selenium.find_element_by_name('password')
+
+        submit = selenium.find_element_by_name('loginsubmit')
+
+        #populate the form with data
+        phone.send_keys('7777777777')
+        password.send_keys(pwd)
+
+        #submit form
+        submit.send_keys(Keys.RETURN)
+        #################################      
+        
+        # login(phone,pwd)
+
+        selenium.get('http://127.0.0.1:8000/staff_page')
+
+        logout = selenium.find_element_by_name('logoutnav') 
+
+        logout.send_keys(Keys.RETURN)
+        assert selenium.current_url == 'http://127.0.0.1:8000/login'
+        selenium.close()
