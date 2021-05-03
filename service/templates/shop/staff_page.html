@@ -3,16 +3,27 @@
 
 <br>
 
-
-    <h3>New requests</h3>
-    <div class="mt-4 col-md-12">
-    {% if message %}
-        <div class="alert alert-{{class}}">
-            {{message}}
-        </div>
-    {% endif %}
-
+<script>
+    var myModal = document.getElementById('staticBackdrop')
+    var myInput = document.getElementById('myInput')
+    
+    myModal.addEventListener('shown.bs.modal', function () {
+      myInput.focus()
+    })
+</script>
+<h3>New requests</h3>
+<div class="mt-4 col-md-12">
+{% if message %}
+    <div class="alert alert-{{class}}">
+        {{message}}
     </div>
+{% endif %}
+
+</div>
+
+<form method="post">
+{% csrf_token %}
+
     <table 
         id="table"
         class="table table-striped"
@@ -20,7 +31,6 @@
         data-toggle="table"
         data-sort-class="table-active"
         data-filter-control="true"
-        data-show-search-clear-button="true"
         data-filter-control-visible="true"
     >
         
@@ -29,36 +39,98 @@
                 <th data-field="requestid" data-sortable="true">Request ID</th>
                 <th data-field="address" data-filter-control="input">Address</th>
                 <th data-field="department" data-filter-control="select">Department</th>
-                <!-- <th>Yes/No</th> -->
-                <th data-field="doa">Date of Appointment</th>
-                <th data-visible="false"></th>
+                <!-- <th data-field="doa">Date of Appointment</th> -->
+                <!-- <th data-visible="false"></th> -->
                 <th>Action</th>
+
+                <!-- <th>Request ID</th>
+                <th>Address</th>
+                <th>Department</th>
+                <th>Date of Appointment</th>
+                <th></th>
+                <th>Action</th> -->
             </tr>
         </thead>
         <tbody>
         {% for request in requests %}
             {% if request.accepted == -1 %}
-                <tr>
-                <form method="post">
-                    {% csrf_token %}
+                <tr id="{{request.requestid}}">
+                
                     <td >{{ request.requestid }}</td>
                     <td >{{ request.address }}</td>
                     <td >{{ request.department }}</td>
-                    <td ><input type="date" class="form-control" id="DoA" name="DoA" placeholder="Date of Appointment"></td>
-                    <td>
+                    <!-- <td ><input type="date" class="form-control" id="DoA" name="DoA" placeholder="Date of Appointment"></td> -->
+                    <!-- <td> -->
                         <!-- {{request.requestid}} -->
-                        <input type="hidden" value="{{request.requestid}}" id="id" name="id"></input>
+                        <!-- <input type="hidden" value="{{request.requestid}}" id="id" name="id"></input> -->
+                    <!-- </td> -->
+                    <td>
+                        <!-- <button type="submit" class="btn btn-primary">Accept</button> -->
+                        <!-- <button type="button" id="mod" class="btn btn-success" data-toggle="modal" data-target="#staticBackdrop" onclick="show()">Accept</button> -->
+                        <button type="button" id="mod" class="btn btn-success" data-toggle="modal" data-target="#staticBackdrop" onClick="show()">Accept</button>
                     </td>
-                    <td><button type="submit" class="btn btn-primary">Accept</button></td>
                     <!-- <td><input type="text" class="form-control" id="DoA" placeholder="Enter Y/N"></td> -->
                     <!-- {% comment %} <td><input type="text" class="form-control" id="Yes/No" placeholder="Enter Y/N"></td> {% endcomment %} -->
-                </form>
+                
                 </tr>
             {% endif %} 
         {% endfor %}
         </tbody>
     </table>
    <br>
+   <div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h6 class="modal-title" id="staticBackdropLabel">Enter Date of first visit</h6>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div>
+                ID:
+            <input type="number" name="reqid" id="finalid" readonly="readonly" placeholder="enter the request id to confirm"></input>
+            </div>
+            <div>
+                Date of Appointment
+            <input type="date" name="DoA" placeholder="enter date"></input>
+            </div>
+            
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary" name="complete">Accept</button>
+        </div>
+        </div>
+    </div>
+    </div>
+</form>
+
+<script type="text/javascript">
+    $("#mod").click(function () {
+        var text = $("#requestid").val();
+        $("#modal_body").html(text);
+        console.log(text);
+    });
+</script>
+
+<link rel="stylesheet"
+    href=
+"https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" 
+    integrity=
+"sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+    crossorigin="anonymous" />
+
+<script>
+function show() {
+    var rowId = event.target.parentNode.parentNode.id;
+    //this gives id of tr whose button was clicked
+    document.getElementById("finalid").value = rowId;
+
+}
+</script>
+
    <!-- <centre>  -->
     <!-- <button type="submit" class="btn btn-primary">Submit</button> -->
 

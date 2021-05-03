@@ -1,12 +1,13 @@
 {% extends "header.html" %}
 {% block body_content %}
-<script>
-var myModal = document.getElementById('staticBackdrop')
-var myInput = document.getElementById('myInput')
 
-myModal.addEventListener('shown.bs.modal', function () {
-  myInput.focus()
-})
+<script>
+    var myModal = document.getElementById('staticBackdrop')
+    var myInput = document.getElementById('myInput')
+    
+    myModal.addEventListener('shown.bs.modal', function () {
+      myInput.focus()
+    })
 </script>
 <br>
 <div class="mt-4 col-md-12">
@@ -30,7 +31,6 @@ myModal.addEventListener('shown.bs.modal', function () {
         data-toggle="table"
         data-sort-class="table-active"
         data-filter-control="true"
-        data-show-search-clear-button="true"
         data-filter-control-visible="true"
     >
     <thead class="thead-dark">
@@ -48,10 +48,9 @@ myModal.addEventListener('shown.bs.modal', function () {
         </tr>
     </thead>
     <tbody>
-        {% for request in requests %}
-            {% if not request.completed %}
-            {% comment %} <!-- {% if %} --> {% endcomment %}
-        <tr>
+    {% for request in requests %}
+    {% if not request.completed %}
+        <tr id="{{request.requestid}}">
             <td>{{ request.requestid }}</td>
             <td>{{ request.address }}</td>
             <td>{{ request.description }}</td>
@@ -66,7 +65,7 @@ myModal.addEventListener('shown.bs.modal', function () {
             <td><a class="btn btn-outline-primary" href="/appointments/{{request.requestid}}" role="button">view details</a></td>
             <!-- <td><input type="date" class="form-control" id="DoA" name="DoA" placeholder="Date of Appointment"></td> -->
             
-            <td><button type="button" id="mod"class="btn btn-success" data-toggle="modal" data-target="#staticBackdrop">Press if completed</button></td>
+            <td><button type="button" id="mod" class="btn btn-success" data-toggle="modal" data-target="#staticBackdrop" onClick="show()">Press if completed</button></td>
             
             {% comment %} <!-- {% endif %} --> {% endcomment %}
         </tr>
@@ -96,13 +95,14 @@ myModal.addEventListener('shown.bs.modal', function () {
                     </div>
                     <div class="modal-body">
                         <div>
+                            ID:
+                            <input type="number" name="reqid" id="finalid" readonly="readonly" placeholder="enter the request id to confirm"></input>
+                        </div>
+                        <div>
                         OTP:
                         <input type="number" name="otp" placeholder="enter otp provided by client"></input>
                         </div>
-                        <div>
-                        ID:
-                        <input type="number" name="reqid" placeholder="enter the request id to confirm"></input>
-                        </div>
+                        
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -113,10 +113,29 @@ myModal.addEventListener('shown.bs.modal', function () {
                 </div>
 </form>
 </div>
+
 <script type="text/javascript">
-        $("#mod").click(function () {
-            var text = $("#requestid").val();
-            $("#modal_body").html(text);
-        });
-    </script>
+    $("#mod").click(function () {
+        var text = $("#requestid").val();
+        $("#modal_body").html(text);
+        console.log(text);
+    });
+</script>
+
+<link rel="stylesheet"
+          href=
+"https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" 
+          integrity=
+"sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+          crossorigin="anonymous" />
+
+<script>
+function show() {
+    var rowId = event.target.parentNode.parentNode.id;
+  //this gives id of tr whose button was clicked
+    document.getElementById("finalid").value = rowId;
+    
+}
+</script>
+
 {% endblock %}
