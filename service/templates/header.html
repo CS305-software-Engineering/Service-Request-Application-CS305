@@ -60,6 +60,10 @@
       {% comment %} <li class="nav-item">
         <a class="nav-link" href="#">Pricing</a>
       </li> {% endcomment %}
+      {% else %}
+      <li class="nav-item {% if request.resolver_match.url_name == 'deleted_request' %}active{% endif %}">
+        <a class="nav-link" href="{% url 'deleted_request' %}">View Deleted Requests</a>
+      </li>
       {% endif %}
       {% if user.is_authenticated %}
       <li class="nav-item">
