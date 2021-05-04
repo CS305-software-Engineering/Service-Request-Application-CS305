@@ -61,7 +61,7 @@
         </thead>
         <tbody>
             {% for request in requests %}
-               
+            {% if request.deleted == -1 %}  
             <tr id="{{request.requestid}}">
                 <td>{{ request.requestid }}</td>
                 <td>{{ request.serviceman_id }}</td>
@@ -100,7 +100,10 @@
             </form>
             </tr>
             
-            <!-- {% endif %} -->
+            
+            
+            {%endif%}
+            
             {% endfor %}
         </tbody>
     </table>
