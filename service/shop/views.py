@@ -309,8 +309,10 @@ def serviceman_inprogress_request(request):
 
 @login_required
 def feedback_page(request,requestid):
-    
-    context={}
+    feedobj = Request.objects.filter(requestid=requestid)
+    rating = feedobj[0].rating
+    feed = feedobj[0].feedback
+    context={"TheFeed":feed,"rating":rating}
     if request.method == 'POST':
         # request_id = request.POST['request']
         request.session['request_id'] = requestid
@@ -324,8 +326,13 @@ def feedback_page(request,requestid):
         print(comment)
         print(rating)
         service_request.update(feedback = comment,rating = rating)
+        feedobj = Request.objects.filter(requestid=requestid)
+        feed = feedobj[0].feedback
+        rating = feedobj[0].rating
         context = {
-            'service_request' : service_request
+            'service_request' : service_request,
+            "TheFeed":feed,
+            "rating":rating
         }
         context.update({"message":"Feedback Added","class":"success"})
 
