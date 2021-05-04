@@ -173,8 +173,9 @@ def user_request(request):
         
         id = request.POST.get('reqid')
         print("deleting request with request id =",id)
-        data_deleted = Request.objects.filter(requestid=id)
-        data_deleted.delete()
+        Request.objects.filter(requestid = id).update(deleted = 1)
+        #data_deleted = Request.objects.filter(requestid=id)
+        #data_deleted.delete()
         #print("=====================requestid====",id)
         service_requests = Request.objects.filter(customer_id = current_user.id)
     # print(service_requests)
@@ -187,6 +188,54 @@ def user_request(request):
 
     return render(request, 'shop/user_page.html', context)
 
+
+def deleted_request(request):
+    current_user = request.user
+    service_requests = Request.objects.filter(customer_id = current_user.id)
+    # print(service_requests)
+    # for i in service_requests:
+    #     print(i.requestid,i.rating,i.feedback)
+    context = {
+        'requests' : service_requests
+    }
+    print("***************************",request.POST)
+    if request.method == 'POST' and 'delete' in request.POST:
+        
+        id = request.POST.get('reqid')
+        print("Permanently deleting request with request id =",id)
+        #Request.objects.filter(requestid = id).update(deleted = 1)
+        data_deleted = Request.objects.filter(requestid=id)
+        data_deleted.delete()
+        #print("=====================requestid====",id)
+        service_requests = Request.objects.filter(customer_id = current_user.id)
+    # print(service_requests)
+    # for i in service_requests:
+    #     print(i.requestid,i.rating,i.feedback)
+        context = {
+            'requests' : service_requests
+        }
+        context.update({"message":"Request Permanently Deleted ","class":"success"})
+
+    elif request.method == 'POST' and 'recheck' in request.POST:
+        
+        id = request.POST.get("rrid")
+        print(id)
+        print("Retrieving the  request with request id =",id)
+        Request.objects.filter(requestid = id).update(deleted = -1)
+        
+        #data_deleted = Request.objects.filter(requestid=id)
+        #data_deleted.delete()
+        #print("=====================requestid====",id)
+        service_requests = Request.objects.filter(customer_id = current_user.id)
+    # print(service_requests)
+    # for i in service_requests:
+    #     print(i.requestid,i.rating,i.feedback)
+        context = {
+            'requests' : service_requests
+        }
+        context.update({"message":"Request Retrieved Successfully ","class":"success"})
+
+    return render(request, 'shop/deleted_request_list.html', context)
 
 @user_passes_test(lambda u: u.is_staff)
 def serviceman_request(request):
