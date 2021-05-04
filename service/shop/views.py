@@ -340,6 +340,22 @@ def get_tags_from_path(image_path):
         tags.append(concept.name)
     return tags
 
+def get_tags_from_bytes(image_bytes):
+    tags = []
+    request = service_pb2.PostModelOutputsRequest(
+    model_id='aaa03c23b3724a16a56b629203edc62c',
+    inputs=[
+      resources_pb2.Input(data=resources_pb2.Data(image=resources_pb2.Image(base64=image_bytes)))
+    ])
+    response = stub.PostModelOutputs(request, metadata=metadata)
+
+    if response.status.code != status_code_pb2.SUCCESS:
+        raise Exception("Request failed, status code: " + str(response.status.code))
+
+    for concept in response.outputs[0].data.concepts:
+        tags.append(concept.name)
+    return tags
+
 
 ## this function to search for a word in a list of words in O(nlogn) complexity ###
 # input: L (a list of words), target (word to be searched)
@@ -371,22 +387,9 @@ input: string depicting exact path of the file or public url of the image
 output: string containing department i.e. "plumber" or "electrical" 
         corresponding error message in case of failure
 """
-def classification(image_path):
+def classification(image_bytes):
     ## Code for image classification
-    validate = URLValidator()
-    try: 
-        validate(image_path)
-        print("is a URL =>", image_path)
-        try:
-            tags = get_tags_from_url(image_path)
-        except:
-            return "invalid URL of the image file, kindly enter exact path of the image file or image url"
-    except ValidationError as e:
-        print("is not a url =>",image_path)
-        try:
-            tags = get_tags_from_path(image_path)
-        except:
-            return "invalid PATH of the image file, kindly enter exact path of the image file or image url"
+    tags = get_tags_from_bytes(image_bytes)
 
     print("****************** tags ***********************\n",tags)
     plumber_set = ['faucet','pipes','pipe','shower','wash','tank','basin','water','H2O','washcloset','bathroom','water closet','flush','bathtub','steel','plumber','plumbing','wet']
@@ -456,13 +459,8 @@ def add_request(request):
             context = {"message": "No image uploaded", "class": "danger"}
             return render(request, "shop/add_request.html", context)
         image_uploaded = request.FILES['image']
-        fs = FileSystemStorage()
-        filename = fs.save(image_uploaded.name, image_uploaded)
-        uploaded_file_url = fs.url(filename)
-        image = os.path.join(MEDIA_ROOT,filename)
-        print(image)
-        category=classification(image)
-        context.update({'category': category ,'image':image})
+        category=classification(image_uploaded.read())
+        context.update({'category': category ,'image':image_uploaded.name})
 
     
     if request.method == 'POST' and 'submit_request' in request.POST:
