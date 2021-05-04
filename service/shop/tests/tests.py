@@ -86,20 +86,22 @@ class LogoutTest(LiveServerTestCase):
         pwd = 'Service@123'
         ###################################
         # def login(phone,password):
-        selenium = webdriver.Chrome()
+        # selenium = webdriver.Chrome()
+        selenium = webdriver.Firefox()
         selenium.get('http://127.0.0.1:8000/login')
         #find the elements you need to submit form
         phone = selenium.find_element_by_name('phone')
         password = selenium.find_element_by_name('password')
 
         submit = selenium.find_element_by_name('loginsubmit')
-
+        time.sleep(2)
         #populate the form with data
         phone.send_keys('7777777777')
         password.send_keys(pwd)
-
+        
         #submit form
         submit.send_keys(Keys.RETURN)
+        time.sleep(2)
         #################################      
         
         # login(phone,pwd)
@@ -109,5 +111,6 @@ class LogoutTest(LiveServerTestCase):
         logout = selenium.find_element_by_name('logoutnav') 
 
         logout.send_keys(Keys.RETURN)
+        time.sleep(2)
         assert selenium.current_url == 'http://127.0.0.1:8000/login'
         selenium.close()
