@@ -244,6 +244,25 @@ def serviceman_request(request):
     context = {
         'requests' : service_requests
     }
+    for row in service_requests:
+        # ids.append(row.id)
+        reqid = row.requestid
+        req_object = Request.objects.filter(requestid=reqid)[0]
+        all_appointments = Appointments.objects.filter(requestid=req_object)
+        ### trigger to update next date of appointment field in Request table
+        nextdoa = "1111-11-11"
+        for app in all_appointments:
+            print(app.doa)
+            print("appointment date =",app.doa, "today = ",datetime.date.today())
+            if(app.doa >= datetime.date.today()):
+                nextdoa = app.doa
+                break
+        context.update({"nextdoa":nextdoa})
+        Request.objects.filter(requestid=reqid).update(doa=nextdoa)
+        #### endtrigger
+    
+    
+    
     if request.method=='POST' and 'updatedoa' in request.POST:
         dateApp = request.POST.get('DoA')
         id = request.POST.get('id')
@@ -300,7 +319,7 @@ def serviceman_inprogress_request(request):
         print(id)
         if str(otp)==str(request1.otp):
             Request.objects.filter(requestid = id).update(completed = True)
-            context.update({"message":"Request marked as completed","class":"success"})
+            context.update({"message":"Request marked as completed","class":"success"}) 
         else:
             context.update({"message":"Wrong OTP","class":"danger"})
     
@@ -448,9 +467,9 @@ def classification(image_path):
     tags.sort()
     i,j,k=0,0,0
     for i in range(len(tags)):
-        while(electrical_set[j]<tags[i] and j<len(electrical_set)):
+        while(j<len(electrical_set)-1 and electrical_set[j]<tags[i]):
             j+=1
-        while(plumber_set[k]<tags[i] and k<len(plumber_set)):
+        while(k<len(plumber_set)-1 and plumber_set[k]<tags[i]):
             k+=1
         
         if electrical_set[j]==tags[i]:
@@ -672,8 +691,20 @@ def appointments(request,reqid):
 
 @user_passes_test(lambda u: u.is_staff)
 def staff_request(request):    
-    all_request = Request.objects.all()
-    context = {"requests": all_request}
+    current_user = request.user
+    user_id = current_user.id
+    userrow = User.objects.filter(id=user_id)
+    servicerow = serviceman.objects.filter(user=userrow[0])
+    print(servicerow)
+    print(servicerow[0].is_electrician)
+    print(servicerow[0].is_plumber)
+    if servicerow[0].is_electrician and servicerow[0].is_plumber:
+        all_request = Request.objects.all()
+    elif servicerow[0].is_electrician:
+        all_request = Request.objects.filter(department="electrical")
+    elif servicerow[0].is_plumber:
+        all_request = Request.objects.filter(department="plumber")
+    context = {"requests": all_request,"is_electrician":servicerow[0].is_electrician,"is_plumber":servicerow[0].is_plumber}
     if request.method == 'GET':        
         return render(request,"shop/staff_page.html",context)
     if request.method == 'POST':
