@@ -2,62 +2,160 @@
 {% block body_content %}
 
 <br>
+
+
+<script>
+    var myModal = document.getElementById('staticBackdrop')
+    var myInput = document.getElementById('myInput')
+    
+    myModal.addEventListener('shown.bs.modal', function () {
+      myInput.focus()
+    })
+</script>
+
+
+
+
 <h2>Your Requested Services</h2>
 
-<div class="conatiner">
-<form method="post">
-    {% csrf_token %}
-    <table class="table table-striped">
-        <thead class="table-dark">
-        <tr>
-            <th>Req ID</th>
-            <th>Service-Man ID</th>
-            <th>Department</th>
-            <th>Status</th>
-            <th>OTP</th>
-            <th>Rating</th>
-            <th>Feedback</th>
-            <th>Add Feedback</th>
-            <th>View Appointments</th>
-        </tr>
-        </thead>
-        {% for request in requests %}
-        <tr>
-            
-            <td>{{ request.requestid }}</td>
-            <td>{{ request.serviceman_id }}</td>
-            <td>{{ request.department }}</td>
-            {% if request.completed %}
-            <td>Completed</td>
-            {%else%}
-            <td>In Progress</td>
-            {%endif%}
-            <td>{{ request.otp }}</td>
-            {%if request.rating == -1%}
-            <td> _ </td>
-            {%else%}
-            <td>{{ request.rating }}</td>
-            {%endif%}
-            
-            <td>{{ request.feedback }}</td>
-            <!-- <td>Request not completed yet</td> -->
-            {% if request.completed %}
-            <td><a class="btn btn-outline-primary" href="/feedback_page/{{request.requestid}}" role="button">Add</a></td>
-            {%else%}
-            <td></td>
-            {%endif%}
+<div class="mt-4 col-md-12">
+    {% if message %}
+        <div class="alert alert-{{class}}">
+            {{message}}
+        </div>
+    {% endif %}
+</div>
 
+{% if user.is_staff %}
+<h2>You are not allowed here</h2>
+{% else %}
+<div class="container-fluid">
+
+
+<form method="post">
+{% csrf_token %}
+    <table 
+        id="table"
+        class="table table-striped"
+        data-height="auto"
+        data-toggle="table"
+        data-sort-class="table-active"
+        data-filter-control="true"
+        data-filter-control-visible="true"    
+    >
+
+        <thead class="thead-dark">
+            <tr>
+                <th data-field="requestid" data-sortable="true" valign="top">Reqest ID</th>
+                <th data-field="serviceman_id" data-sortable="true">Serviceman ID</th>
+                <th data-field="department" data-filter-control="select">Department</th>
+                <th data-field="status" data-filter-control="select">Status</th>
+                <th data-field="otp">OTP</th>
+                <th data-field="rating" data-sortable="true" data-filter-control="select">Rating</th>
+                <th data-field="feedback">Feedback</th>
+                <th data-field="addfeedback">Add Feedback</th>
+                <th data-field="view_appointments" >View Appointments</th>
+                <th data-visible="false"></th>
+                <th>Delete Request</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in requests %}
+               
+            <tr id="{{request.requestid}}">
+                <td>{{ request.requestid }}</td>
+                <td>{{ request.serviceman_id }}</td>
+                <td>{{ request.department }}</td>
+                {% if request.completed %}
+                <td>Completed</td>
+                {%else%}
+                <td>In Progress</td>
+                {%endif%}
+                
+                <td>{{ request.otp }}</td>
+                
+                {%if request.rating == -1%}
+                <td> _ </td>
+                {%else%}
+                <td>{{ request.rating }}</td>
+                {%endif%}
+                
+                <td>{{ request.feedback }}</td>
+                <!-- <td>Request not completed yet</td> -->
+                {% if request.completed %}
+                <td><a class="btn btn-outline-primary" href="/feedback_page/{{request.requestid}}" role="button">Add</a></td>
+                {%else%}
+                <td></td>
+                {%endif%}
+
+                
+                <td><a class="btn btn-outline-secondary" href="/appointments/{{request.requestid}}" role="button">Click here</a></td>
+              
+                <td><input type="hidden" value="{{request.requestid}}" id="id" name="id"></input></td>
+                {%if request.accepted == -1 %}
+                <td><button type="button" id="mod" class="btn btn-danger" data-toggle="modal" data-target="#staticBackdrop" onClick="show()">Delete</button></td>
+                {%else%}
+                <td></td>
+                {%endif%}
+            </form>
+            </tr>
             
-            <td><a class="btn btn-outline-secondary" href="/appointments/{{request.requestid}}" role="button">Click here</a></td>
-            <!-- <td><button>hello</button></td> -->
-            <!-- {% if request.completed %} -->
-            <!-- <td><button type="submit" value="{{ request.requestid }}" name="request">Add Feedback</button></td> -->
-            <!-- {% else %} -->
-            
-        </tr>
             <!-- {% endif %} -->
-        {% endfor %}
+            {% endfor %}
+        </tbody>
     </table>
+
+    <div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title" id="staticBackdropLabel">Enter the otp to complete</h6>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        ID:
+                        <input type="number" name="reqid" id="finalid" readonly="readonly" placeholder="enter the request id to confirm"></input>
+                    </div>
+                    Are you sure?
+                            
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">No, take me back</button>
+                <button type="submit" class="btn btn-danger" name="delete">Yes, Delete</button>
+            </div>
+        </div>
+    </div>
+
 </form>
 </div>
+
+
+<script type="text/javascript">
+    $("#mod").click(function () {
+        var text = $("#requestid").val();
+        $("#modal_body").html(text);
+        console.log(text);
+    });
+</script>
+
+<link rel="stylesheet"
+    href=
+"https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" 
+    integrity=
+"sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+    crossorigin="anonymous" />
+
+<script>
+function show() {
+    var rowId = event.target.parentNode.parentNode.id;
+    //this gives id of tr whose button was clicked
+    document.getElementById("finalid").value = rowId;
+
+}
+</script>
+
+{% endif %}
 {% endblock %}

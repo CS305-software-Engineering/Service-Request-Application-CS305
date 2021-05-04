@@ -5,7 +5,7 @@ from django.views.generic.base import RedirectView
 
 urlpatterns = [
     path('', RedirectView.as_view(url='/login')),
-    path('login', login_attempt, name='login'),
+    path('login', login_attempt, name='login_attempt'),
     path('register', register, name='register'),
     path('register_service-man',register_sevice,name='register_service'),
     path('home',home, name='home'),
@@ -17,7 +17,7 @@ urlpatterns = [
     path('serviceman_request',serviceman_request,name='serviceman_request'),
     path('serviceman_completed_request',serviceman_completed_request,name='serviceman_completed_request'),
     path('serviceman_inprogress_request',serviceman_inprogress_request,name='serviceman_inprogress_request'),
-    path('appointments/<str:reqid>',appointments,name="appointments")
+    path('appointments/<int:reqid>',appointments,name="appointments")
 ]
 
 if settings.DEBUG:

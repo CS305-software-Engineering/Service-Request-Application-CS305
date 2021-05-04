@@ -1,5 +1,9 @@
 {% extends "header.html" %}
 {% block body_content %}
+
+
+
+
 <script>
 var myModal = document.getElementById('staticBackdrop')
 var myInput = document.getElementById('myInput')
@@ -9,36 +13,46 @@ myModal.addEventListener('shown.bs.modal', function () {
 })
 </script>
 <br>
+
+<h3>Accepted Requests</h3>
 <div class="mt-4 col-md-12">
     {% if message %}
         <div class="alert alert-{{class}}">
             {{message}}
         </div>
     {% endif %}
-
-    </div>
-<h3>Accepted Requests</h3>
-
-
+</div>
+<div class="container-fluid">
 <form method="POST">
 {% csrf_token %}
-    <table class="table table-striped">
+    <table 
+        id="table"
+        class="table table-striped"
+        data-height="auto"
+        data-toggle="table"
+        data-sort-class="table-active"
+        data-filter-control="true"
+        data-filter-control-visible="true"
+    >
+        
+        <thead class="thead-dark">
         <tr>
-        <thead class="table-light">
-            <th>Request ID</th>
-            <th>Address</th>
+            <th data-field="requestid" data-sortable="true">Request ID</th>
+            <th data-field="address" data-filter-control="input">Address</th>
             <th>Description</th>
             <!-- <th>Yes/No</th> -->
             <!-- <th>Confirm Y/N</th> -->
-            <th>Next Date of Appointment</th>
-            <th>Status</th>
+            <th data-field="doa" data-sortable="true">Next Date of Appointment</th>
+            <th data-field="status" data-filter-control="select">Status</th>
             <th>View Details</th>
             <th></th>
-        </thead>
         </tr>
+        </thead>
+        
+        <tbody>
         {% for request in requests %}
             {% comment %} <!-- {% if %} --> {% endcomment %}
-        <tr>
+        <tr id="{{request.requestid}}">
             <td>{{ request.requestid }}</td>
             <td>{{ request.address }}</td>
             <td>{{ request.description }}</td>
@@ -57,13 +71,15 @@ myModal.addEventListener('shown.bs.modal', function () {
             <td><a class="btn btn-outline-primary" href="/appointments/{{request.requestid}}" role="button">view details</a></td>
             <!-- <td><input type="date" class="form-control" id="DoA" name="DoA" placeholder="Date of Appointment"></td> -->
             {% if not request.completed %}
-            <td><button type="button" id="mod"class="btn btn-success" data-toggle="modal" data-target="#staticBackdrop">Press if completed</button></td>
+            <td><button type="button" id="mod" class="btn btn-success" data-toggle="modal" data-target="#staticBackdrop" onClick="show()">Press if completed</button></td>
+            <!-- <td><input type="button" value="submit" onClick="show()"></input></td> -->
             {% else %}
             <td></td>
             {% endif %}
             {% comment %} <!-- {% endif %} --> {% endcomment %}
         </tr>
         {% endfor %}
+    </tbody>
     </table>
 
    <!-- <centre> <button type="submit" class="btn btn-primary">Submit</button></> -->
@@ -76,36 +92,57 @@ myModal.addEventListener('shown.bs.modal', function () {
 
 <!-- Modal -->
 <div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                    <div class="modal-header">
-                        <h6 class="modal-title" id="staticBackdropLabel">Enter the otp to complete</h6>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div>
-                        OTP:
-                        <input type="number" name="otp" placeholder="enter otp provided by client"></input>
-                        </div>
-                        <div>
-                        ID:
-                        <input type="number" name="reqid" placeholder="enter the request id to confirm"></input>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary" name="complete">Complete</button>
-                    </div>
-                    </div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="staticBackdropLabel">Enter the otp to complete</h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    ID:
+                    <input type="number" name="reqid" id="finalid" readonly="readonly" placeholder="enter the request id to confirm"></input>
                 </div>
+                <div>
+                    OTP:
+                    <input type="number" name="otp" placeholder="enter otp provided by client"></input>
                 </div>
+                        
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary" name="complete">Complete</button>
+        </div>
+    </div>
+</div>
+                
+
+</div>
 </form>
+</div>
 <script type="text/javascript">
         $("#mod").click(function () {
             var text = $("#requestid").val();
             $("#modal_body").html(text);
+            console.log(text);
         });
-    </script>
+</script>
+
+<link rel="stylesheet"
+              href=
+"https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" 
+              integrity=
+"sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+              crossorigin="anonymous" />
+
+<script>
+    function show() {
+        var rowId = event.target.parentNode.parentNode.id;
+      //this gives id of tr whose button was clicked
+        document.getElementById("finalid").value = rowId;
+        
+    }
+</script>
 {% endblock %}
