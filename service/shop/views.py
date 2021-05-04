@@ -661,6 +661,7 @@ def appointments(request,reqid):
             print(purpose)
             newapp = Appointments(requestid = req_object,doa=dateofapp,purpose=purpose)
             newapp.save()
+            context.update({"message":"New appointment created successfully","class":"success"})
         else:
             date = request.POST.get('DoA')
             date = parse(date).date()
@@ -679,6 +680,7 @@ def appointments(request,reqid):
                 # req_object.remark_from_staff = remarksfromstaff
                 app_object.update(remark_from_staff = remarksfromstaff)
             print("\n\nnew remarks saved\n\n")
+            context.update({"message":"Remark updated successfully","class":"success"})
         #### to be discussed and completed
         
         all_appointments = Appointments.objects.filter(requestid=req_object)
@@ -693,7 +695,7 @@ def appointments(request,reqid):
         context.update({"nextdoa":nextdoa})
         Request.objects.filter(requestid=reqid).update(doa=nextdoa)
         ##### endtrigger
-        context.update({'message':'new appointment created!','class':'success'})
+        # context.update({'message':'new appointment created!','class':'success'})
         return render(request,"shop/appointments.html",context)
 
 @user_passes_test(lambda u: u.is_staff)
