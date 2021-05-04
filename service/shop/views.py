@@ -173,8 +173,9 @@ def user_request(request):
         
         id = request.POST.get('reqid')
         print("deleting request with request id =",id)
-        data_deleted = Request.objects.filter(requestid=id)
-        data_deleted.delete()
+        Request.objects.filter(requestid = id).update(deleted = 1)
+        #data_deleted = Request.objects.filter(requestid=id)
+        #data_deleted.delete()
         #print("=====================requestid====",id)
         service_requests = Request.objects.filter(customer_id = current_user.id)
     # print(service_requests)
